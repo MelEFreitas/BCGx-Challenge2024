@@ -8,8 +8,12 @@ environment:
   sdk: ^3.5.3
 
 dependencies:
+  dartz: ^0.10.1
+  equatable: ^2.0.5
   flutter:
     sdk: flutter
+  flutter_bloc: ^8.1.6
+  get_it: ^8.0.0
 
 dev_dependencies:
   flutter_test:
