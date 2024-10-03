@@ -42,4 +42,8 @@ frontend/android/app/debug
 frontend/android/app/profile
 frontend/android/app/release
 
-.env
+*.env
+
+# Python
+__pycache__/
+.ruff_cache/
