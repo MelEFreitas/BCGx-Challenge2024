@@ -6,8 +6,10 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: fastapi_backend
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
+    # ports:
+    #   - "8000:8000"
     env_file:
       - .env
     volumes:
@@ -19,7 +21,6 @@ services:
       - POSTGRES_DB=${POSTGRES_DB?Variable not set}
       - POSTGRES_HOST=${POSTGRES_HOST?Variable not set}
       - POSTGRES_PORT=${POSTGRES_PORT?Variable not set}
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     depends_on:
       db:
         condition: service_healthy
@@ -46,6 +47,19 @@ services:
       interval: 1s
       timeout: 5s
       retries: 5
+
+  frontend:
+    build:
+      context: ./frontend 
+      dockerfile: Dockerfile
+    container_name: flutter_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+      - db
+    networks:
+      - app-network
 
 networks:
   app-network:

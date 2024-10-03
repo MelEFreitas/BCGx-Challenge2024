@@ -13,6 +13,7 @@ from app.db.models.user import User
 from app.schemas.user import UserCreate
 from app.core.config import settings
 
+
 def get_user(db: Session, user_id: int) -> User | None:
     return db.query(User).filter(User.id == user_id).first()
 
