@@ -8,15 +8,15 @@ from app.db import crud
 from app.core.security import decode_access_token, create_access_token
 from app.db.database import get_db
 from app.core.config import settings
+from app.db.models.user import UserDB
 
 router = APIRouter()
 
 # This defines the token URL that the frontend will interact with to get the token
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-
 @router.post("/token", response_model=Token)
-def login_for_access_token(
+def sign_in_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
     user = crud.authenticate_user(db, form_data.username, form_data.password)
@@ -32,10 +32,9 @@ def login_for_access_token(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-
 def get_current_user(
     token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
-):
+) -> UserDB:
     payload = decode_access_token(token)
     if not payload:
         raise HTTPException(

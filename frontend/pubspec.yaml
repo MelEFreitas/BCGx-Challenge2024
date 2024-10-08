@@ -9,12 +9,16 @@ environment:
 
 dependencies:
   dartz: ^0.10.1
+  dio: ^5.7.0
   equatable: ^2.0.5
   flutter:
     sdk: flutter
   flutter_bloc: ^8.1.6
+  flutter_secure_storage: ^4.2.1
   get_it: ^8.0.0
   json_annotation: ^4.9.0
+  jwt_decoder: ^2.0.1
+  logger: ^2.4.0
 
 dev_dependencies:
   flutter_test:
