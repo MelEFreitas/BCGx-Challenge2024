@@ -6,10 +6,10 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: fastapi_backend
-    expose:
-      - "8000"
-    # ports:
-    #   - "8000:8000"
+    # expose:
+    #   - "8000"
+    ports:
+      - "8000:8000"
     env_file:
       - .env
     volumes:
@@ -48,18 +48,18 @@ services:
       timeout: 5s
       retries: 5
 
-  frontend:
-    build:
-      context: ./frontend 
-      dockerfile: Dockerfile
-    container_name: flutter_frontend
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
-      - db
-    networks:
-      - app-network
+  # frontend:
+  #   build:
+  #     context: ./frontend 
+  #     dockerfile: Dockerfile
+  #   container_name: flutter_frontend
+  #   ports:
+  #     - "3000:80"
+  #   depends_on:
+  #     - backend
+  #     - db
+  #   networks:
+  #     - app-network
 
 networks:
   app-network:
