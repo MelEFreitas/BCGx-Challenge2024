@@ -5,10 +5,10 @@ part 'user.g.dart';
 
 @JsonSerializable()
 class UserModel {
-  String email;
-  String role;
-
   UserModel({required this.email, required this.role});
+
+  final String email;
+  final String role;
 
   // Default empty user to avoid null cases
   static final empty = UserModel(

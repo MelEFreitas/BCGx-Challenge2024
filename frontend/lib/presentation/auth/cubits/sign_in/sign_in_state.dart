@@ -1,4 +1,4 @@
-import 'package:equatable/equatable.dart';
+part of 'sign_in_cubit.dart';
 
 sealed class SignInState extends Equatable {
   const SignInState();
@@ -11,14 +11,7 @@ class SignInStateInitial extends SignInState {}
 
 class SignInStateLoading extends SignInState {}
 
-class SignInStateSuccess extends SignInState {
-  const SignInStateSuccess({required this.token});
-
-  final String token;
-
-  @override
-  List<Object> get props => [token];
-}
+class SignInStateSuccess extends SignInState {}
 
 class SignInStateFailure extends SignInState {
   const SignInStateFailure({required this.errorMessage});

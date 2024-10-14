@@ -5,31 +5,33 @@ from app.schemas.question_answer import QuestionAnswerBase
 
 
 class ChatBase(BaseModel):
-    title: str
+    question: str
 
 
-class ChatContent(ChatBase):
-    question_answer: QuestionAnswerBase
-
-
-class ChatCreate(ChatContent):
+class ChatCreate(ChatBase):
     pass
 
 
-class ChatUpdate(BaseModel):
+class ChatUpdate(ChatBase):
+    pass
+
+
+class ChatContent(BaseModel):
     question_answer: QuestionAnswerBase
 
 
-class Chat(ChatBase):
+class ChatInfo(BaseModel):
+    title: str
+    question_answer: QuestionAnswerBase
+
+    
+class ChatSummary(BaseModel):
     id: int
+    title: str
+
+
+class Chat(ChatSummary):
     conversation: List[QuestionAnswerBase]
-
-    class Config:
-        from_attributes = True
-
-
-class ChatSummary(ChatBase):
-    id: int
 
     class Config:
         from_attributes = True

@@ -1,4 +1,4 @@
-import 'package:frontend/core/infrastructure/secure_storage_service.dart';
+import 'package:frontend/core/infrastructure/shared_preferences_service.dart';
 import 'package:frontend/service_locator.dart';
 
 abstract class AuthLocalService {
@@ -8,6 +8,6 @@ abstract class AuthLocalService {
 class AuthLocalServiceImpl implements AuthLocalService {
   @override
   Future<void> signOut() async {
-    sl<SecureStorageService>().deleteToken();
+    await sl<SharedPreferencesService>().deleteToken();
   }
 }

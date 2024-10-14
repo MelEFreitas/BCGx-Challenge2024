@@ -3,25 +3,24 @@ import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:frontend/core/constants/api_urls.dart';
 import 'package:frontend/core/error_handling/exception.dart';
-// import 'package:frontend/core/infrastructure/secure_storage_service.dart';
+import 'package:frontend/core/infrastructure/shared_preferences_service.dart';
 import 'package:frontend/core/network/dio_client.dart';
-import 'package:frontend/data/models/auth/auth_user_req.dart';
 import 'package:frontend/data/models/auth/sign_in_req.dart';
 import 'package:frontend/data/models/auth/sign_up_req.dart';
 import 'package:frontend/data/models/user/user.dart';
 import 'package:frontend/service_locator.dart';
 
 abstract class AuthApiService {
-  Future<String> signIn(SignInReq req);
+  Future<void> signIn(SignInReq req);
   Future<void> signUp(SignUpReq req);
-  Future<UserModel> authUser(AuthUserReq req);
+  Future<UserModel> authUser();
 }
 
 class AuthApiServiceImpl implements AuthApiService {
   @override
-  Future<String> signIn(SignInReq req) async {
+  Future<void> signIn(SignInReq req) async {
     try {
-      final response = await sl<DioClient>().post(ApiUrls.tokenUrl,
+      final response = await sl<DioClient>().post(ApiUrls.createTokenUrl,
           data: req.toMap(),
           options: Options(
             contentType: Headers.formUrlEncodedContentType,
@@ -30,9 +29,7 @@ class AuthApiServiceImpl implements AuthApiService {
       if (token == null) {
         throw SignInException(message: "Failed to fetch the token");
       }
-
-      return token;
-      //await sl<SecureStorageService>().saveToken(token);
+      await sl<SharedPreferencesService>().saveToken(token);
     } on DioException catch (e) {
       throw SignInException(message: e.response!.data['message']);
     } catch (e) {
@@ -44,7 +41,7 @@ class AuthApiServiceImpl implements AuthApiService {
   @override
   Future<void> signUp(SignUpReq req) async {
     try {
-      await sl<DioClient>().post(ApiUrls.registerUrl,
+      await sl<DioClient>().post(ApiUrls.createUserUrl,
           data: req.toMap(),
           options: Options(
             headers: {'Content-Type': 'application/json; charset=UTF-8'},
@@ -57,13 +54,13 @@ class AuthApiServiceImpl implements AuthApiService {
   }
 
   @override
-  Future<UserModel> authUser(AuthUserReq req) async {
+  Future<UserModel> authUser() async {
     try {
-      //final String? token = await sl<SecureStorageService>().getToken();
-      final response = await sl<DioClient>().get(ApiUrls.userUrl,
+      final token = await sl<SharedPreferencesService>().getToken();
+      final response = await sl<DioClient>().get(ApiUrls.authenticateUserUrl,
           options: Options(
             headers: {
-              'Authorization': 'Bearer ${req.token}',
+              'Authorization': 'Bearer $token',
             },
           ));
       return UserModel.fromJson(response.data);

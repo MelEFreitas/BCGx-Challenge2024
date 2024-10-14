@@ -1,7 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:frontend/core/error_handling/exception.dart';
 import 'package:frontend/core/error_handling/failure.dart';
-import 'package:frontend/data/models/auth/auth_user_req.dart';
 import 'package:frontend/data/models/auth/sign_in_req.dart';
 import 'package:frontend/data/models/auth/sign_up_req.dart';
 import 'package:frontend/data/sources/auth/auth_api_service.dart';
@@ -12,7 +11,7 @@ import 'package:frontend/service_locator.dart';
 
 class AuthRepositoryImpl extends AuthRepository {
   @override
-  Future<Either<Failure, String>> signIn(SignInReq req) async {
+  Future<Either<Failure, void>> signIn(SignInReq req) async {
     try {
       return Right(await sl<AuthApiService>().signIn(req));
     } on SignInException catch (e) {
@@ -39,9 +38,9 @@ class AuthRepositoryImpl extends AuthRepository {
   }
 
   @override
-  Future<Either<Failure, UserEntity>> authUser(AuthUserReq req) async {
+  Future<Either<Failure, UserEntity>> authUser() async {
     try {
-      final user = await sl<AuthApiService>().authUser(req);
+      final user = await sl<AuthApiService>().authUser();
       return Right(user.toEntity());
     } on AuthUserException catch (e) {
       return Left(AuthUserFailure(message: e.message));

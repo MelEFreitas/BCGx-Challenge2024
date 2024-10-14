@@ -1,15 +1,16 @@
 from fastapi import HTTPException, status
+from sqlalchemy import desc
 from sqlalchemy.orm import Session
 
 from app.core.security import (
     get_password_hash,
     verify_password,
 )
-from app.db.models.user import UserDB
-from app.schemas.user import UserCreate
 from app.db.models.chat import ChatDB
 from app.db.models.question_answer import QuestionAnswerDB
-from app.schemas.chat import ChatCreate, ChatUpdate
+from app.db.models.user import UserDB
+from app.schemas.user import UserCreate
+from app.schemas.chat import ChatContent, ChatInfo
 
 
 def get_user(db: Session, user_id: int) -> UserDB | None:
@@ -53,7 +54,7 @@ def update_user_role(db: Session, email: str, new_role: str) -> UserDB | None:
     return db_user
 
 
-def create_chat(db: Session, chat: ChatCreate, user: UserDB) -> ChatDB:
+def create_chat(db: Session, chat: ChatInfo, user: UserDB) -> ChatDB:
     db_chat = ChatDB(title=chat.title, user_id=user.id)
     db.add(db_chat)
     db.commit()
@@ -71,7 +72,7 @@ def create_chat(db: Session, chat: ChatCreate, user: UserDB) -> ChatDB:
     return db_chat
 
 
-def add_question_answer_to_chat(db: Session, chat_id: int, chat: ChatUpdate, user: UserDB) -> ChatDB:
+def add_question_answer_to_chat(db: Session, chat_id: int, chat: ChatContent, user: UserDB) -> ChatDB:
     db_chat = db.query(ChatDB).filter(ChatDB.id == chat_id).first()
 
     if db_chat is None:
@@ -106,7 +107,7 @@ def delete_chat(db: Session, chat_id: int, user: UserDB) -> None:
 
 
 def get_all_chat_summaries(db: Session, user: UserDB) -> list[ChatDB]:
-    return db.query(ChatDB.id, ChatDB.title).filter(ChatDB.user_id == user.id).all()
+    return db.query(ChatDB.id, ChatDB.title).filter(ChatDB.user_id == user.id).order_by(desc(ChatDB.created_at)).all()
 
 
 def get_chat_by_id(db: Session, chat_id: int, user: UserDB) -> ChatDB:
