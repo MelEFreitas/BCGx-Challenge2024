@@ -6,6 +6,7 @@ import 'package:frontend/presentation/home/cubits/update_user/update_user_cubit.
 import 'package:frontend/presentation/home/widgtes/chat_display.dart';
 import 'package:frontend/presentation/home/widgtes/chat_history.dart';
 import 'package:frontend/presentation/home/widgtes/chat_input.dart';
+import 'package:frontend/presentation/home/widgtes/language_switcher.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -54,19 +55,19 @@ class HomeScreen extends StatelessWidget {
                   return IconButton(
                     icon: const Icon(Icons.menu),
                     onPressed: () {
-                      Scaffold.of(context).openDrawer(); // Now this works!
+                      Scaffold.of(context).openDrawer();
                     },
                   );
                 },
               ),
               actions: [
+                const LanguageSwitcherButton(),
                 PopupMenuButton<String>(
-                  icon: const Icon(Icons.settings), // Three horizontal dots
+                  icon: const Icon(Icons.settings),
                   onSelected: (value) {
                     if (value == 'sign_out') {
                       _showSignOutDialog(context);
-                    }
-                    else if (value == 'change_role') {
+                    } else if (value == 'change_role') {
                       _showChangeRoleDialog(context);
                     }
                   },
@@ -148,8 +149,7 @@ class HomeScreen extends StatelessWidget {
                       if (MediaQuery.of(context).size.width >= 600)
                         Container(
                           color: Colors.grey[200],
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: 16.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           height: 60.0,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -161,46 +161,53 @@ class HomeScreen extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              PopupMenuButton<String>(
-                                icon: const Icon(Icons.settings), // Three horizontal dots
-                                onSelected: (value) {
-                                  if (value == 'sign_out') {
-                                    _showSignOutDialog(context);
-                                  }
-                                  else if (value == 'change_role') {
-                                    _showChangeRoleDialog(context);
-                                  }
-                                },
-                                itemBuilder: (BuildContext context) {
-                                  return [
-                                    const PopupMenuItem<String>(
-                                      value: 'sign_out',
-                                      child: Row(
-                                        children: [
-                                          Icon(Icons.delete, color: Colors.red),
-                                          SizedBox(width: 8),
-                                          Text(
-                                            'Sign Out',
-                                            style: TextStyle(color: Colors.red),
+                              Row(
+                                children: [
+                                  PopupMenuButton<String>(
+                                    icon: const Icon(
+                                        Icons.settings), // Three horizontal dots
+                                    onSelected: (value) {
+                                      if (value == 'sign_out') {
+                                        _showSignOutDialog(context);
+                                      } else if (value == 'change_role') {
+                                        _showChangeRoleDialog(context);
+                                      }
+                                    },
+                                    itemBuilder: (BuildContext context) {
+                                      return [
+                                        const PopupMenuItem<String>(
+                                          value: 'sign_out',
+                                          child: Row(
+                                            children: [
+                                              Icon(Icons.delete, color: Colors.red),
+                                              SizedBox(width: 8),
+                                              Text(
+                                                'Sign Out',
+                                                style: TextStyle(color: Colors.red),
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                                    const PopupMenuItem<String>(
-                                      value: 'change_role',
-                                      child: Row(
-                                        children: [
-                                          Icon(Icons.settings, color: Colors.blue),
-                                          SizedBox(width: 8),
-                                          Text(
-                                            'Change Role',
-                                            style: TextStyle(color: Colors.blue),
+                                        ),
+                                        const PopupMenuItem<String>(
+                                          value: 'change_role',
+                                          child: Row(
+                                            children: [
+                                              Icon(Icons.settings,
+                                                  color: Colors.blue),
+                                              SizedBox(width: 8),
+                                              Text(
+                                                'Change Role',
+                                                style:
+                                                    TextStyle(color: Colors.blue),
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                                  ];
-                                },
+                                        ),
+                                      ];
+                                    },
+                                  ),
+                                  const LanguageSwitcherButton(),
+                                ],
                               ),
                             ],
                           ),
@@ -230,18 +237,18 @@ class HomeScreen extends StatelessWidget {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () async {
-                // Handle the deletion of the chat
                 await context.read<AuthCubit>().signOut();
                 if (context.mounted) context.read<GetChatCubit>().resetChat();
                 if (context.mounted) Navigator.of(context).pop();
               },
-              child: const Text('Sign Out', style: TextStyle(color: Colors.red)),
+              child:
+                  const Text('Sign Out', style: TextStyle(color: Colors.red)),
             ),
           ],
         );
@@ -250,23 +257,21 @@ class HomeScreen extends StatelessWidget {
   }
 
   void _showChangeRoleDialog(BuildContext context) {
-    // Fetch the current role from the AuthCubit state
     final authState = context.read<AuthCubit>().state;
     String currentRole = '';
 
     if (authState is AuthStateAuthenticated) {
-      currentRole = authState.user.role; // Get current role from state
+      currentRole = authState.user.role;
     }
 
-    // Define the roles
     final roles = [
       {"title": "Admin", "description": "Full access to the system"},
       {"title": "Editor", "description": "Can edit and manage content"},
       {"title": "Viewer", "description": "Can only view content"},
     ];
 
-    // Find the index of the current role
-    int selectedRoleIndex = roles.indexWhere((role) => role['title'] == currentRole);
+    int selectedRoleIndex =
+        roles.indexWhere((role) => role['title'] == currentRole);
 
     showDialog(
       context: context,
@@ -279,7 +284,6 @@ class HomeScreen extends StatelessWidget {
               children: [
                 const Text('Select your new role:'),
                 const SizedBox(height: 10),
-                // Create the role selection boxes
                 ...roles.asMap().entries.map((entry) {
                   int index = entry.key;
                   String roleTitle = entry.value["title"]!;
@@ -288,12 +292,11 @@ class HomeScreen extends StatelessWidget {
                     cursor: SystemMouseCursors.click,
                     child: GestureDetector(
                       onTap: () {
-                        selectedRoleIndex = index; // Update the selected index
-                        // Use setState-like mechanism to rebuild the dialog
+                        selectedRoleIndex = index;
                         (context as Element).markNeedsBuild();
                       },
                       child: Container(
-                        width: double.infinity, // Make the box take full width
+                        width: double.infinity,
                         margin: const EdgeInsets.symmetric(vertical: 8.0),
                         padding: const EdgeInsets.all(16.0),
                         decoration: BoxDecoration(
@@ -331,17 +334,20 @@ class HomeScreen extends StatelessWidget {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
+                Navigator.of(context).pop();
               },
               child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () async {
-                // Handle the role submission
                 String newRole = roles[selectedRoleIndex]['title']!;
                 await context.read<UpdateUserCubit>().updateUser(newRole);
-                if(context.mounted) await context.read<AuthCubit>().authenticateUser();
-                if(context.mounted) Navigator.of(context).pop(); // Close the dialog
+                if (context.mounted) {
+                  await context.read<AuthCubit>().authenticateUser();
+                }
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                }
               },
               child: const Text('Submit', style: TextStyle(color: Colors.blue)),
             ),
@@ -350,6 +356,4 @@ class HomeScreen extends StatelessWidget {
       },
     );
   }
-
-
 }

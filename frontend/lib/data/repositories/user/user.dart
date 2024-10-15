@@ -7,7 +7,6 @@ import 'package:frontend/domain/repositories/user/user.dart';
 import 'package:frontend/service_locator.dart';
 
 class UserRepositoryImpl implements UserRepository {
-  
   @override
   Future<Either<Failure, void>> updateUser(UpdateUserReq req) async {
     try {
@@ -18,5 +17,4 @@ class UserRepositoryImpl implements UserRepository {
       return const Left(UpdateChatFailure());
     }
   }
-  
 }

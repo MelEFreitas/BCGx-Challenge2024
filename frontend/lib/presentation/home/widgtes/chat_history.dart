@@ -83,7 +83,10 @@ class ChatHistory extends StatelessWidget {
               onPressed: () async {
                 await context.read<DeleteChatCubit>().deleteChat(chatId);
                 if (context.mounted) context.read<GetChatCubit>().resetChat();
-                if (context.mounted) await context.read<GetChatSummariesCubit>().getAllChatSummaries();
+                if (context.mounted)
+                  await context
+                      .read<GetChatSummariesCubit>()
+                      .getAllChatSummaries();
                 if (context.mounted) Navigator.of(context).pop();
               },
               child: const Text('Delete', style: TextStyle(color: Colors.red)),
@@ -94,4 +97,3 @@ class ChatHistory extends StatelessWidget {
     );
   }
 }
-

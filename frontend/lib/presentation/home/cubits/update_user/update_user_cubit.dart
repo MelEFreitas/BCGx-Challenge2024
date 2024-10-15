@@ -8,17 +8,16 @@ import 'package:frontend/service_locator.dart';
 
 part 'update_user_state.dart';
 
-class UpdateUserCubit extends Cubit<UpdateUserState>{
+class UpdateUserCubit extends Cubit<UpdateUserState> {
   UpdateUserCubit() : super(UpdateUserStateInitial());
 
   Future<void> updateUser(String role) async {
     emit(UpdateUserStateLoading());
-    final Either<Failure, void> result = await sl<UpdateUserUsecase>().call(
-      params: UpdateUserReq(role: role)
-    );
+    final Either<Failure, void> result =
+        await sl<UpdateUserUsecase>().call(params: UpdateUserReq(role: role));
     result.fold(
-      (failure) => emit(UpdateUserStateFailure(errorMessage: failure.message)),
-      (_) => emit(UpdateUserStateSuccess())
-    );
+        (failure) =>
+            emit(UpdateUserStateFailure(errorMessage: failure.message)),
+        (_) => emit(UpdateUserStateSuccess()));
   }
 }

@@ -47,6 +47,7 @@ Future<void> initializeDependencies() async {
   sl.registerSingleton<DeleteChatUseCase>(DeleteChatUseCase());
   sl.registerSingleton<UpdateChatUseCase>(UpdateChatUseCase());
   sl.registerSingleton<GetChatUseCase>(GetChatUseCase());
-  sl.registerSingleton<GetAllChatSummariesUseCase>(GetAllChatSummariesUseCase());
+  sl.registerSingleton<GetAllChatSummariesUseCase>(
+      GetAllChatSummariesUseCase());
   sl.registerSingleton<UpdateUserUsecase>(UpdateUserUsecase());
 }

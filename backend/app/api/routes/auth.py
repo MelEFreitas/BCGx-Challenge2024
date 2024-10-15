@@ -12,13 +12,15 @@ from app.db.models.user import UserDB
 
 router = APIRouter()
 
-# This defines the token URL that the frontend will interact with to get the token
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 @router.post("/token", response_model=Token)
 def sign_in_access_token(
     form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
+    """
+    Create access token.
+    """
     user = crud.authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -35,6 +37,9 @@ def sign_in_access_token(
 def get_current_user(
     token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
 ) -> UserDB:
+    """
+    Validate access token.
+    """
     payload = decode_access_token(token)
     if not payload:
         raise HTTPException(

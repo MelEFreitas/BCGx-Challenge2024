@@ -35,7 +35,7 @@ class ChatApiServiceImpl implements ChatApiService {
       );
       return ChatModel.fromJson(response.data);
     } on DioException catch (e) {
-      throw CreateChatException(message: e.response!.data['message']);
+      throw CreateChatException(message: e.response?.data['message']);
     } catch (_) {
       rethrow;
     }
@@ -46,7 +46,7 @@ class ChatApiServiceImpl implements ChatApiService {
     final String url = '${ApiUrls.chatUrl}/${req.chatId}';
     final token = await sl<SharedPreferencesService>().getToken();
     try {
-      final response = await sl<DioClient>().delete(
+      await sl<DioClient>().delete(
         url,
         options: Options(
           headers: {
@@ -55,7 +55,7 @@ class ChatApiServiceImpl implements ChatApiService {
         ),
       );
     } on DioException catch (e) {
-      throw DeleteChatException(message: e.response!.data['message']);
+      throw DeleteChatException(message: e.response?.data['message']);
     } catch (_) {
       rethrow;
     }
@@ -71,12 +71,13 @@ class ChatApiServiceImpl implements ChatApiService {
               'Authorization': 'Bearer $token',
             },
           ));
-      List<ChatSummaryModel> chatSummaries =( response.data as List)
-        .map((item) => ChatSummaryModel.fromJson(item as Map<String, dynamic>))
-        .toList();
+      List<ChatSummaryModel> chatSummaries = (response.data as List)
+          .map(
+              (item) => ChatSummaryModel.fromJson(item as Map<String, dynamic>))
+          .toList();
       return chatSummaries;
     } on DioException catch (e) {
-      throw GetAllChatSummariesException(message: e.response!.data['message']);
+      throw GetAllChatSummariesException(message: e.response?.data['message']);
     } catch (_) {
       rethrow;
     }
@@ -95,7 +96,7 @@ class ChatApiServiceImpl implements ChatApiService {
           ));
       return ChatModel.fromJson(response.data);
     } on DioException catch (e) {
-      throw GetChatException(message: e.response!.data['message']);
+      throw GetChatException(message: e.response?.data['message']);
     } catch (_) {
       rethrow;
     }
@@ -106,7 +107,7 @@ class ChatApiServiceImpl implements ChatApiService {
     try {
       final String url = '${ApiUrls.chatUrl}/${req.chatId}';
       final token = await sl<SharedPreferencesService>().getToken();
-      final response = await sl<DioClient>().post(
+      await sl<DioClient>().post(
         url,
         options: Options(
           headers: {
@@ -116,7 +117,7 @@ class ChatApiServiceImpl implements ChatApiService {
         data: req.toMap(),
       );
     } on DioException catch (e) {
-      throw UpdateChatException(message: e.response!.data['message']);
+      throw UpdateChatException(message: e.response?.data['message']);
     } catch (_) {
       rethrow;
     }

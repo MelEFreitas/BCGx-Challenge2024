@@ -5,6 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:frontend/presentation/auth/cubits/auth/auth_cubit.dart';
 import 'package:frontend/presentation/auth/cubits/sign_in/sign_in_cubit.dart';
 import 'package:frontend/presentation/auth/cubits/sign_up/sign_up_cubit.dart';
+import 'package:frontend/presentation/home/cubits/language/language_cubit.dart';
+import 'package:frontend/presentation/home/widgtes/language_switcher.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -24,41 +27,95 @@ class _SignUpScreenState extends State<SignUpScreen> {
     {"title": "Viewer", "description": "Can only view content"}
   ];
 
-  // Controllers for the text input fields
   final TextEditingController _emailCon = TextEditingController();
   final TextEditingController _passwordCon = TextEditingController();
   final TextEditingController _confirmPasswordCon = TextEditingController();
 
   final _signUpFormKey = GlobalKey<FormState>();
 
+  String? _emailError;
+  String? _passwordError;
+  String? _confirmPasswordError;
+
+  void _validateForm(AppLocalizations localizations) {
+    setState(() {
+      final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
+      if (_emailCon.text.isEmpty) {
+        _emailError = localizations.emailErrorEmpty;
+      } else if (!emailRegex.hasMatch(_emailCon.text)) {
+        _emailError = localizations.emailErrorValid;
+      } else {
+        _emailError = null;
+      }
+
+      final passwordRegex =
+          RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$');
+
+      if (_passwordCon.text.isEmpty) {
+        _passwordError = localizations.passwordErrorEmpty;
+      } else if (!passwordRegex.hasMatch(_passwordCon.text)) {
+        _passwordError = localizations.passwordErrorValid;
+      } else {
+        _passwordError = null;
+      }
+
+      if (_confirmPasswordCon.text.isEmpty) {
+        _confirmPasswordError = localizations.confirmPasswordErrorEmpty;
+      } else if (_confirmPasswordCon.text != _passwordCon.text) {
+        _confirmPasswordError = localizations.confirmPasswordErrorValid;
+      } else {
+        _confirmPasswordError = null;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Get the screen width
     final screenWidth = MediaQuery.of(context).size.width;
-
-    // Set a fixed width for text fields and boxes based on screen size
+    final localizations = AppLocalizations.of(context)!;
     double textFieldWidth = screenWidth > 600 ? 450 : screenWidth * 0.95;
     double boxWidth = 300;
+    final bool isLoading =
+        context.watch<SignInCubit>().state is SignInStateLoading ||
+            context.watch<SignUpCubit>().state is SignUpStateLoading;
 
     return Scaffold(
+      appBar: AppBar(
+        actions: const [
+          LanguageSwitcherButton(),
+        ],
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
       body: MultiBlocListener(
         listeners: [
           BlocListener<SignUpCubit, SignUpState>(
-            listener: (context, state) async {
-              if (state is SignUpStateFailure) {
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text(state.errorMessage)));
-              } else if (state is SignUpStateSuccess) {
-                final email = _emailCon.text.trim();
-                final password = _passwordCon.text.trim();
-                await context.read<SignInCubit>().signIn(email, password);
-              }
+              listener: (context, state) async {
+            if (state is SignUpStateFailure) {
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text(state.errorMessage)));
+            } else if (state is SignUpStateSuccess) {
+              final email = _emailCon.text.trim();
+              final password = _passwordCon.text.trim();
+              await context.read<SignInCubit>().signIn(email, password);
             }
-          ),
+          }),
           BlocListener<AuthCubit, AuthState>(
             listener: (context, state) {
               if (state is AuthStateAuthenticated) {
                 Navigator.of(context).pop();
+              }
+            },
+          ),
+          BlocListener<LanguageCubit, Locale>(
+            listener: (context, state) {
+              if (_emailError != null ||
+                  _passwordError != null ||
+                  _confirmPasswordError != null) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  _validateForm(AppLocalizations.of(context)!);
+                });
               }
             },
           ),
@@ -72,63 +129,39 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const SizedBox(
-                        height: 40), // Add some spacing at the top if needed
-                    const Text(
-                      'Sign Up',
-                      style: TextStyle(
-                        fontSize: 32, // Make the font size large
-                        fontWeight: FontWeight.bold, // Make the title bold
+                    const SizedBox(height: 40),
+                    Text(
+                      localizations.signUp,
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
                       ),
-                      textAlign: TextAlign.center, // Center the text
+                      textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 20),
-                    // Email Input Field
                     SizedBox(
                       width: textFieldWidth,
                       child: TextFormField(
                         controller: _emailCon,
-                        decoration: const InputDecoration(
-                          labelText: 'Email',
-                          hintText: 'Enter your email',
-                          border: OutlineInputBorder(),
-                          errorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.red),
-                          ),
-                          focusedErrorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.red),
-                          ),
+                        decoration: InputDecoration(
+                          labelText: localizations.email,
+                          hintText: localizations.emailHint,
+                          border: const OutlineInputBorder(),
+                          errorText: _emailError,
                         ),
-                        validator: (value) {
-                          // Regular expression for email validation
-                          final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-                          if (value == null || value.isEmpty) {
-                            return 'Email cannot be empty';
-                          } else if (!emailRegex.hasMatch(value)) {
-                            return 'Enter a valid email';
-                          }
-                          return null; // If valid, return null
-                        },
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Password Input Field
                     SizedBox(
                       width: textFieldWidth,
                       child: TextFormField(
                         controller: _passwordCon,
-                        obscureText:
-                            !_isPasswordVisible, // Control password visibility
+                        obscureText: !_isPasswordVisible,
                         decoration: InputDecoration(
-                          labelText: 'Password',
-                          hintText: 'Enter your password',
+                          labelText: localizations.password,
+                          hintText: localizations.passwordHint,
                           border: const OutlineInputBorder(),
-                          errorBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.red),
-                          ),
-                          focusedErrorBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.red),
-                          ),
+                          errorText: _passwordError,
                           suffixIcon: IconButton(
                             icon: Icon(
                               _isPasswordVisible
@@ -137,38 +170,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                             onPressed: () {
                               setState(() {
-                                _isPasswordVisible =
-                                    !_isPasswordVisible; // Toggle password visibility
+                                _isPasswordVisible = !_isPasswordVisible;
                               });
                             },
                           ),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Password cannot be empty';
-                          }
-                          return null;
-                        },
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Confirm Password Input Field
                     SizedBox(
                       width: textFieldWidth,
                       child: TextFormField(
                         controller: _confirmPasswordCon,
-                        obscureText:
-                            !_isConfirmPasswordVisible, // Control confirm password visibility
+                        obscureText: !_isConfirmPasswordVisible,
                         decoration: InputDecoration(
-                          labelText: 'Confirm Password',
-                          hintText: 'Confirm your password',
+                          labelText: localizations.confirmPassword,
+                          hintText: localizations.confirmPasswordHint,
                           border: const OutlineInputBorder(),
-                          errorBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.red),
-                          ),
-                          focusedErrorBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.red),
-                          ),
+                          errorText: _confirmPasswordError,
                           suffixIcon: IconButton(
                             icon: Icon(
                               _isConfirmPasswordVisible
@@ -178,25 +197,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             onPressed: () {
                               setState(() {
                                 _isConfirmPasswordVisible =
-                                    !_isConfirmPasswordVisible; // Toggle confirm password visibility
+                                    !_isConfirmPasswordVisible;
                               });
                             },
                           ),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please confirm your password';
-                          } else if (value != _passwordCon.text) {
-                            return 'Passwords do not match';
-                          }
-                          return null;
-                        },
                       ),
                     ),
                     const SizedBox(height: 20),
-                    const Text('Select Your Role'),
+                    Text(localizations.selectRole),
                     const SizedBox(height: 10),
-                    // Horizontally scrollable role selection boxes
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
@@ -249,7 +259,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Already have an account? Sign In (Clickable)
                     MouseRegion(
                       cursor: SystemMouseCursors.click,
                       child: GestureDetector(
@@ -257,13 +266,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           Navigator.of(context).pop();
                         },
                         child: RichText(
-                          text: const TextSpan(
-                            text: 'Already have an account? ',
-                            style: TextStyle(color: Colors.black),
+                          text: TextSpan(
+                            text: localizations.alreadyHaveAccount,
+                            style: const TextStyle(color: Colors.black),
                             children: [
                               TextSpan(
-                                text: 'Sign In',
-                                style: TextStyle(
+                                text: localizations.signIn,
+                                style: const TextStyle(
                                   color: Colors.blue,
                                   decoration: TextDecoration.underline,
                                 ),
@@ -274,44 +283,42 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Sign Up Button
                     Center(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 40, vertical: 16),
-                          backgroundColor:
-                              Colors.blue, // Button background color
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(12), // Rounded edges
-                          ),
-                        ),
-                        onPressed: () {
-                          if (_signUpFormKey.currentState!.validate()) {
-                            final email = _emailCon.text.trim();
-                            final password = _passwordCon.text.trim();
-                            final confirmPassword =
-                                _confirmPasswordCon.text.trim();
-                            final role = _roles[_selectedRole]['title']!;
+                      child: isLoading
+                          ? const CircularProgressIndicator()
+                          : ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 40, vertical: 16),
+                                backgroundColor: Colors.blue,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              onPressed: () {
+                                _validateForm(localizations);
 
-                            // Performing the sign-up action
-                            context
-                                .read<SignUpCubit>()
-                                .signUp(email, password, role);
-                          } else {
-                            log('Sign Up form validation failed');
-                          }
-                        },
-                        child: const Text(
-                          'Sign Up',
-                          style: TextStyle(
-                              fontSize:
-                                  18, // Make the text inside the button larger
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
-                        ),
-                      ),
+                                if (_emailError == null &&
+                                    _passwordError == null &&
+                                    _confirmPasswordError == null) {
+                                  final email = _emailCon.text.trim();
+                                  final password = _passwordCon.text.trim();
+                                  final role = _roles[_selectedRole]['title']!;
+                                  context
+                                      .read<SignUpCubit>()
+                                      .signUp(email, password, role);
+                                } else {
+                                  log('Sign Up form validation failed');
+                                }
+                              },
+                              child: Text(
+                                localizations.signUp,
+                                style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white),
+                              ),
+                            ),
                     ),
                   ],
                 ),

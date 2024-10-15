@@ -15,7 +15,8 @@ class UserApiServiceImpl implements UserApiService {
   Future<void> updateUser(UpdateUserReq req) async {
     try {
       final token = await sl<SharedPreferencesService>().getToken();
-      final response = await sl<DioClient>().post(ApiUrls.updateUserRoleUrl,
+      await sl<DioClient>().post(
+        ApiUrls.updateUserRoleUrl,
         options: Options(
           headers: {
             'Authorization': 'Bearer $token',
@@ -29,5 +30,4 @@ class UserApiServiceImpl implements UserApiService {
       rethrow;
     }
   }
-  
 }

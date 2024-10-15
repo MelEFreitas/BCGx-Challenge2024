@@ -11,8 +11,7 @@ part 'update_chat_state.dart';
 class UpdateChatCubit extends Cubit<UpdateChatState> {
   UpdateChatCubit() : super(UpdateChatStateInitial());
 
-  Future<void> updateChat(
-      int chatId, String question) async {
+  Future<void> updateChat(int chatId, String question) async {
     emit(UpdateChatStateLoading());
     final Either<Failure, void> result = await sl<UpdateChatUseCase>()
         .call(params: UpdateChatReq(chatId: chatId, question: question));

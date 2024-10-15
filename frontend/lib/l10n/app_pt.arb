@@ -1,0 +1,23 @@
+{
+  "@@locale": "pt",
+  "signIn": "Entrar",
+  "signUp": "Registrar",
+  "email": "Email",
+  "emailHint": "Insira o seu email",
+  "emailErrorEmpty": "O campo do email não pode estar vazio",
+  "emailErrorValid": "Insira um email válido",
+  "password": "Senha",
+  "passwordHint": "Insira a sua senha",
+  "passwordErrorEmpty": "O campo da senha não pode estar vazio",
+  "passwordErrorValid": "A senha deve possuir ao menos 8 caracteres e:\n* Uma letra maiúscula\n* Uma letra minúscula\n* Um número\n* Um caractere especial",
+  "confirmPassword": "Confirmar Senha",
+  "confirmPasswordHint": "Confirme sua Senha",
+  "confirmPasswordErrorEmpty": "O campo para confirmar a senha não pode estar vazio",
+  "confirmPasswordErrorValid": "As senhas estão diferentes",
+  "chooseLanguage": "Escolha o idioma",
+  "english": "Inglês",
+  "portuguese": "Português",
+  "selectRole": "Selecione a sua função",
+  "dontHaveAccount": "Ainda não possui uma conta? ",
+  "alreadyHaveAccount": "Já possui uma conta? "
+}

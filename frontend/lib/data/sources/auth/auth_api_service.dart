@@ -31,7 +31,7 @@ class AuthApiServiceImpl implements AuthApiService {
       }
       await sl<SharedPreferencesService>().saveToken(token);
     } on DioException catch (e) {
-      throw SignInException(message: e.response!.data['message']);
+      throw SignInException(message: e.response?.data['message']);
     } catch (e) {
       log("$e");
       rethrow;
@@ -47,7 +47,7 @@ class AuthApiServiceImpl implements AuthApiService {
             headers: {'Content-Type': 'application/json; charset=UTF-8'},
           ));
     } on DioException catch (e) {
-      throw SignUpException(message: e.response!.data['message']);
+      throw SignUpException(message: e.response?.data['message']);
     } catch (_) {
       rethrow;
     }
@@ -65,7 +65,7 @@ class AuthApiServiceImpl implements AuthApiService {
           ));
       return UserModel.fromJson(response.data);
     } on DioException catch (e) {
-      throw AuthUserException(message: e.response!.data['message']);
+      throw AuthUserException(message: e.response?.data['message']);
     } catch (e) {
       rethrow;
     }

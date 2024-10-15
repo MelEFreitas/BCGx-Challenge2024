@@ -8,33 +8,35 @@ class LoggerInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     final options = err.requestOptions;
-    final requestPath = '${options.baseUrl}${options.path}';
-    logger.e('${options.method} request ==> $requestPath');
-    logger.d('Error type: ${err.error} \n '
-        'Error message: ${err.message}');
+    logger.e('${options.method} request ==> ${options.baseUrl}${options.path}');
+    logger.e('*** Error ***\n'
+        'Error: ${err.message}');
+    if (err.response != null) {
+      logger.e('Status Code: ${err.response?.statusCode}\n'
+          'Error Data: ${err.response?.data}\n'
+          'Error Headers: ${err.response?.headers}');
+    }
     handler.next(err);
   }
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    final requestPath = '${options.baseUrl}${options.path}';
-    logger.i('${options.method} request ==> $requestPath');
-    // Log request details
-    logger.i('--- REQUEST ---\n'
+    logger.i('${options.method} request ==> ${options.baseUrl}${options.path}');
+    logger.i('*** Request ***\n'
         'Method: ${options.method}\n'
-        'URL: $requestPath\n'
+        'URL: ${options.uri}\n'
         'Headers: ${options.headers}\n'
         'Query Parameters: ${options.queryParameters}\n'
-        'Request Body: ${options.data ?? "No Body"}\n');
+        'Request Body: ${options.data ?? "No Body"}');
     handler.next(options);
   }
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    logger.d('STATUSCODE: ${response.statusCode} \n '
-        'STATUSMESSAGE: ${response.statusMessage} \n'
-        'HEADERS: ${response.headers} \n'
-        'Data: ${response.data}');
+    logger.i('*** Response ***\n'
+        'Status Code: ${response.statusCode}\n'
+        'Data: ${response.data}\n'
+        'Headers: ${response.headers}');
     handler.next(response);
   }
 }

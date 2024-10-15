@@ -9,7 +9,8 @@ import 'package:frontend/service_locator.dart';
 class CreateChatUseCase
     implements UseCase<Either<Failure, ChatEntity>, CreateChatReq> {
   @override
-  Future<Either<Failure, ChatEntity>> call({required CreateChatReq params}) async {
+  Future<Either<Failure, ChatEntity>> call(
+      {required CreateChatReq params}) async {
     return sl<ChatRepository>().createChat(params);
   }
 }

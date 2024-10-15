@@ -1,0 +1,23 @@
+{
+  "@@locale": "en",
+  "signIn": "Sign In",
+  "signUp": "Sign Up",
+  "email": "Email",
+  "emailHint": "Enter your email",
+  "emailErrorEmpty": "Email cannot be empty",
+  "emailErrorValid": "Enter a valid email",
+  "password": "Password",
+  "passwordHint": "Enter your password",
+  "passwordErrorEmpty": "Password cannot be empty",
+  "passwordErrorValid": "The password must contain at least 8 characters and:\n* One uppercase letter\n* One lowercase letter\n* One number\n* One special character",
+  "confirmPassword": "Confirm Password",
+  "confirmPasswordHint": "Confirm your password",
+  "confirmPasswordErrorEmpty": "Please confirm your password",
+  "confirmPasswordErrorValid": "Passwords do not match",
+  "chooseLanguage": "Choose Language",
+  "english": "English",
+  "portuguese": "Portuguese",
+  "selectRole": "Select your role",
+  "dontHaveAccount": "Don't have an account? ",
+  "alreadyHaveAccount": "Already have an account? "
+}

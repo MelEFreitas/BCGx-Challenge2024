@@ -1,6 +1,6 @@
 class UpdateUserReq {
   UpdateUserReq({required this.role});
-  
+
   final String role;
 
   Map<String, dynamic> toMap() {

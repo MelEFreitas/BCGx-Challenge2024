@@ -14,8 +14,8 @@ class GetChatCubit extends Cubit<GetChatState> {
 
   Future<void> getChat(int chatId) async {
     emit(GetChatStateLoading());
-    final Either<Failure, ChatEntity> result = await sl<GetChatUseCase>()
-        .call(params: GetChatReq(chatId: chatId));
+    final Either<Failure, ChatEntity> result =
+        await sl<GetChatUseCase>().call(params: GetChatReq(chatId: chatId));
     result.fold(
         (failure) => emit(GetChatStateFailure(errorMessage: failure.message)),
         (chat) => emit(GetChatStateSuccess(chat: chat)));

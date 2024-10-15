@@ -16,7 +16,7 @@ class _ChatDisplayState extends State<ChatDisplay> {
     if (_scrollController.hasClients) {
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 3000),
+        duration: const Duration(milliseconds: 2000),
         curve: Curves.easeOut,
       );
     }
@@ -29,24 +29,30 @@ class _ChatDisplayState extends State<ChatDisplay> {
         if (state is GetChatStateInitial) {
           return const Center(child: Text('Send a message to start a chat!'));
         } else if (state is GetChatStateFailure) {
-          return Center(child: Text('Failed to load chat: ${state.errorMessage}'));
+          return Center(
+              child: Text('Failed to load chat: ${state.errorMessage}'));
         } else if (state is GetChatStateSuccess) {
           final chat = state.chat;
 
           // Display the list of questions and answers
-          WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+          WidgetsBinding.instance
+              .addPostFrameCallback((_) => _scrollToBottom());
 
           return ListView.builder(
             controller: _scrollController, // Attach the ScrollController
             padding: const EdgeInsets.all(8.0),
-            itemCount: chat.conversation.length * 2, // Each question and answer is separate
+            itemCount: chat.conversation.length *
+                2, // Each question and answer is separate
             itemBuilder: (context, index) {
-              final qaIndex = index ~/ 2; // Dividing index by 2 to get the corresponding QuestionAnswerEntity
-              final isQuestion = index.isEven; // Even indices represent questions, odd ones represent answers
+              final qaIndex = index ~/
+                  2; // Dividing index by 2 to get the corresponding QuestionAnswerEntity
+              final isQuestion = index
+                  .isEven; // Even indices represent questions, odd ones represent answers
               final qa = chat.conversation[qaIndex];
 
               return Align(
-                alignment: isQuestion ? Alignment.centerRight : Alignment.centerLeft,
+                alignment:
+                    isQuestion ? Alignment.centerRight : Alignment.centerLeft,
                 child: Padding(
                   padding: isQuestion
                       ? const EdgeInsets.fromLTRB(400.0, 10.0, 10.0, 10.0)
