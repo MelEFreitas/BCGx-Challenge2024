@@ -10,30 +10,25 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter  # Import the
 from langchain_community.vectorstores import FAISS
 from langchain_core.output_parsers import StrOutputParser
 from langchain.memory import CombinedMemory, ConversationSummaryMemory, ConversationEntityMemory
+import tiktoken
 
 
 class Chatbot:
-    def __init__(self, document_path: str, openai_api_key: str, temperature=0.7):
+    def __init__(self, openai_api_key: str, faiss_index_path: str, temperature=0.5):
         """Inicializa o chatbot com recuperação de documentos e gerenciamento de contexto"""
         # Configurar o modelo OpenAI
         self.llm = ChatOpenAI(temperature=temperature, openai_api_key=openai_api_key)
         
-        # Carregar documentos (exemplo: PDF)
-        self.loader = PyMuPDFLoader(document_path)
-        self.documents = self.loader.load()
-
-        #Separar o texto em pedaços menores
-        self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-        documents_split = self.text_splitter.split_documents(self.documents)
-        
         #Creating Embeddings
         self.embbedings = OpenAIEmbeddings(openai_api_type=openai_api_key)
-        faiss = FAISS.from_documents(documents_split, self.embbedings)
+        
+        # Carregar o índice FAISS existente
+        self.faiss = FAISS.load_local(faiss_index_path, self.embbedings, allow_dangerous_deserialization=True)
         
         # Configurar retriever
-        self.retriever = faiss.as_retriever(search_type="similarity_score_threshold", 
-                                            search_kwargs={"score_threshold": 0.8},
-                                            search_limit=5)
+        self.retriever = self.faiss.as_retriever(search_type="similarity_score_threshold", 
+                                                search_kwargs={"score_threshold": 0.8},
+                                                search_limit=5)
 
         # Configurar a memória de contexto
         summary_memory = ConversationSummaryMemory(llm=OpenAI(), memory_key="summary_history")  # Use 'summary_history' as key
@@ -120,11 +115,6 @@ class Chatbot:
         """
         Processa perguntas gerais (não precisam de contexto de documentos).
         """
-        #chat_history = [AIMessage(content="Hi there, how can I help you today?")]
-        #ai_message = self.question_chain.invoke({
-        #    "question": question,
-        #    "chat_history": self.chat_history
-        #})
         
         ai_message = self.llm.predict(f"Pergunta: {question}")
         
@@ -135,12 +125,15 @@ class Chatbot:
         """
         Processa perguntas específicas, buscando documentos relevantes e respondendo com base neles.
         """
-        #chat_history = [AIMessage(content="Hi there, how can I help you today?")]
         context = self.retriever.get_relevant_documents(question)
+        encoding = tiktoken.encoding_for_model("gpt-4o")
+
+        total_tokens = sum(len(encoding.encode(str(c))) for c in context[0])  # Convertendo para string
+        #print(f"Total tokens: {total_tokens}")  # Adicione esta linha para verificar o total de tokens
         
         ai_message = self.rag_chain.invoke({
             "question": question,
-            "context": context,
+            "context": context[0],
             "chat_history": self.chat_history
         })
 

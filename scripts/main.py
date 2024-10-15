@@ -6,7 +6,7 @@ from chatbot import Chatbot
 load_dotenv(".env")
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')    
 
-pdf_path = "C:/Users/Melissa Freitas/Documents/Melissa/BCGx-Challenge2024/data/Plano de Acao de Enfrentamento as Mudancas Climaticas do Grande ABC.pdf"
+faiss_index_path = "faiss_index"
 
 
 def main():
@@ -16,8 +16,9 @@ def main():
     print("----------------------------------------\n")
     
     chatbot = Chatbot(
-        document_path=pdf_path,  # Caminho para o documento
-        openai_api_key=OPENAI_API_KEY   # Substitua pela sua chave da OpenAI
+        #document_path=pdf_path,  
+        openai_api_key=OPENAI_API_KEY,   
+        faiss_index_path = faiss_index_path
     )
     
     chat = True
@@ -41,9 +42,10 @@ def main():
             if docs:
                 print("\nDocumentos usados como referência:")
                 for doc in docs:
-                    print(f"- Página: {doc.metadata.get('page', 'Desconhecida')}")
-                    print(f"Conteúdo: {doc.page_content[:500]}...\n")  # Exibe os primeiros 500 caracteres
-            
+                    print(f"- Página: {doc.metadata.get('page_number')}")
+                    print(f"- File: {doc.metadata.get('file_name')}")
+                    print(f"Conteúdo: {doc.page_content}\n")  
+                    
             # Exibir histórico da conversa
             print("\nHistórico da conversa:")
             for msg in chat_history:
