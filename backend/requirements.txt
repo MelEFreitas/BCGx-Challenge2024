@@ -9,4 +9,10 @@ bcrypt==4.2.0
 passlib[bcrypt]==1.7.4
 python-jose[cryptography]==3.3.0
 python-multipart==0.0.12
-openai=== 1.51.2
+openai===1.50.2
+langchain==0.3.1
+langchain-core==0.3.6
+langchain-community==0.3.1
+langchain-openai==0.2.1
+langchain-text-splitters==0.3.0
+faiss-cpu==1.9.0
