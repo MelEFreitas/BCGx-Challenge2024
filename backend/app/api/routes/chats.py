@@ -35,7 +35,7 @@ async def create_chat(
             If the user doesn't exist, returns a 404 Not Found.
     """
     title = create_chat_title(question=chat)
-    response = await ask_question_ai(question=chat)
+    response = ask_question_ai(db_chat=None, question=chat, role=current_user.role)
     chat_info = ChatInfo(title=title, question_answer=response)
     db_chat = crud.create_chat(db, current_user, chat_info)
     return Chat(
@@ -75,7 +75,7 @@ async def add_question_answer_to_chat(
     if db_chat.user_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to update this chat")
     
-    response = await ask_question_ai(question=chat)
+    response = ask_question_ai(db_chat=db_chat, question=chat, role=current_user.role)
     chat_content = ChatContent(question_answer=response)
     db_qa = crud.add_question_answer_to_chat(db, db_chat, chat_content)
     return chat_content
