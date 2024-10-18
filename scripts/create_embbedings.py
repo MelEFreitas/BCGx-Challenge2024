@@ -126,7 +126,7 @@ def main():
     documents = load_and_process_documents(file_paths)
 
     # Inicializa os embeddings
-    embeddings = OpenAIEmbeddings()
+    embeddings = OpenAIEmbeddings(model='gpt-4')
 
     # Cria embeddings para os documentos processados
     all_documents = []

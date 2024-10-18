@@ -1,6 +1,5 @@
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chains import LLMChain, ConversationalRetrievalChain
-#from langchain_community.chat_models import ChatOpenAI
 from langchain_openai import ChatOpenAI
 from langchain_openai import OpenAI
 from langchain.schema import HumanMessage, AIMessage, SystemMessage
@@ -14,10 +13,14 @@ import tiktoken
 
 
 class Chatbot:
-    def __init__(self, openai_api_key: str, faiss_index_path: str, temperature=0.5):
+    def __init__(self, openai_api_key: str, faiss_index_path: str, role:str):
         """Inicializa o chatbot com recuperação de documentos e gerenciamento de contexto"""
         # Configurar o modelo OpenAI
-        self.llm = ChatOpenAI(temperature=temperature, openai_api_key=openai_api_key)
+        self.llm = ChatOpenAI(model="gpt-4o",
+                              temperature=0.7,  # Ajuste da criatividade
+                              frequency_penalty=0.5,  # Penalidade por repetição de palavras
+                              presence_penalty=0.3,  # Incentiva variedade de palavras
+                              )
         
         #Creating Embeddings
         self.embbedings = OpenAIEmbeddings(openai_api_type=openai_api_key)
@@ -27,8 +30,7 @@ class Chatbot:
         
         # Configurar retriever
         self.retriever = self.faiss.as_retriever(search_type="similarity_score_threshold", 
-                                                search_kwargs={"score_threshold": 0.8},
-                                                search_limit=5)
+                                                search_kwargs={"score_threshold": 0.75, 'k':5})#,search_limit=1)
 
         # Configurar a memória de contexto
         summary_memory = ConversationSummaryMemory(llm=OpenAI(), memory_key="summary_history")  # Use 'summary_history' as key
@@ -63,10 +65,12 @@ class Chatbot:
         # Cadeia de prompts para o sistema de QA com recuperação de documentos
         qa_system_prompt = """
         You are a climate crisis specialist. Use the following context from retrieved documents to answer the user's question.
-
-        Context: {context}
-
+        Adapt your language to a person that is a {role} can undestand clearly.
+        
+        Context: {context},
+        
         Question: {question}
+        
         """
         qa_prompt = ChatPromptTemplate.from_template(qa_system_prompt)
 
@@ -86,7 +90,9 @@ class Chatbot:
 
         # Prompt de classificação de perguntas
         general_question_prompt_template = """
-        Você é um assistente treinado para identificar o tipo de pergunta. Diga apenas "Geral" se a pergunta for uma questão genérica e não precisa consultar documentos, ou "Específica" se a pergunta precisar de informações detalhadas de uma base de dados.
+        Você é um assistente treinado para identificar o tipo de pergunta. 
+        Classifique como "Geral" se a pergunta for APENAS um cumprimento do tipo "Oi/Olá/Bom dia/Obrigada", 
+        ou "Específica" se for alguma outra pergunta e precisar de informações detalhadas de uma base de dados.
 
         Pergunta: {question}
 
@@ -126,6 +132,11 @@ class Chatbot:
         Processa perguntas específicas, buscando documentos relevantes e respondendo com base neles.
         """
         context = self.retriever.get_relevant_documents(question)
+        
+        if not context:
+            return "I don't have enough information to answer this question. \
+                    Can you reformulate your question or ask anything else?", None, self.chat_history
+        
         encoding = tiktoken.encoding_for_model("gpt-4o")
 
         total_tokens = sum(len(encoding.encode(str(c))) for c in context[0])  # Convertendo para string

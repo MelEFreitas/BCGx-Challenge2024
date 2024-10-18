@@ -8,6 +8,7 @@ OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 
 faiss_index_path = "faiss_index"
 
+role = 'Public Manager'
 
 def main():
     
@@ -18,7 +19,8 @@ def main():
     chatbot = Chatbot(
         #document_path=pdf_path,  
         openai_api_key=OPENAI_API_KEY,   
-        faiss_index_path = faiss_index_path
+        faiss_index_path = faiss_index_path,
+        role = role
     )
     
     chat = True
