@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:dio/dio.dart';
 import 'package:frontend/core/constants/api_urls.dart';
 import 'package:frontend/core/error_handling/exception.dart';
@@ -20,21 +18,21 @@ class AuthApiServiceImpl implements AuthApiService {
   @override
   Future<void> signIn(SignInReq req) async {
     try {
-      final response = await sl<DioClient>().post(ApiUrls.createTokenUrl,
+      final response = await sl<DioClient>().post(ApiUrls.createTokensUrl,
           data: req.toMap(),
           options: Options(
             contentType: Headers.formUrlEncodedContentType,
           ));
-      final token = response.data['access_token'];
-      if (token == null) {
-        throw SignInException(message: "Failed to fetch the token");
-      }
-      await sl<SharedPreferencesService>().saveToken(token);
+      final accessToken = response.data[TokenKeys.accessTokenKey];
+      final refreshToken = response.data[TokenKeys.refreshTokenKey];
+      await sl<SharedPreferencesService>()
+          .saveToken(accessToken, TokenKeys.accessTokenKey);
+      await sl<SharedPreferencesService>()
+          .saveToken(refreshToken, TokenKeys.refreshTokenKey);
     } on DioException catch (e) {
-      throw SignInException(message: e.response?.data['message']);
-    } catch (e) {
-      log("$e");
-      rethrow;
+      throw SignInException(
+          message: e.response?.data['detail'],
+          statusCode: e.response?.statusCode);
     }
   }
 
@@ -44,30 +42,34 @@ class AuthApiServiceImpl implements AuthApiService {
       await sl<DioClient>().post(ApiUrls.createUserUrl,
           data: req.toMap(),
           options: Options(
-            headers: {'Content-Type': 'application/json; charset=UTF-8'},
+            headers: {'Content-Type': 'application/json'},
           ));
     } on DioException catch (e) {
-      throw SignUpException(message: e.response?.data['message']);
-    } catch (_) {
-      rethrow;
+      throw SignUpException(
+          message: e.response?.data['detail'],
+          statusCode: e.response?.statusCode);
     }
   }
 
   @override
   Future<UserModel> authUser() async {
     try {
-      final token = await sl<SharedPreferencesService>().getToken();
+      final accessToken = await sl<SharedPreferencesService>()
+          .getToken(TokenKeys.accessTokenKey);
+      if (accessToken == null) {
+        throw AuthUserException();
+      }
       final response = await sl<DioClient>().get(ApiUrls.authenticateUserUrl,
           options: Options(
             headers: {
-              'Authorization': 'Bearer $token',
+              'Authorization': 'Bearer $accessToken',
             },
           ));
       return UserModel.fromJson(response.data);
     } on DioException catch (e) {
-      throw AuthUserException(message: e.response?.data['message']);
-    } catch (e) {
-      rethrow;
+      throw AuthUserException(
+          message: e.response?.data['detail'],
+          statusCode: e.response?.statusCode);
     }
   }
 }

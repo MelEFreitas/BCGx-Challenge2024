@@ -8,10 +8,8 @@ class DioClient {
       : _dio = Dio(
           BaseOptions(
             responseType: ResponseType.json,
-            // sendTimeout: const Duration(seconds: 10),
-            // receiveTimeout: const Duration(seconds: 10)
           ),
-        )..interceptors.addAll([LoggerInterceptor()]);
+        )..interceptors.addAll([LoggerInterceptor(), TokenInterceptor()]);
 
   Future<Response> get(
     String url, {

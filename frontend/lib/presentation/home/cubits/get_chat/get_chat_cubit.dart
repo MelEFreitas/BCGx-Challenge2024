@@ -12,7 +12,7 @@ part 'get_chat_state.dart';
 class GetChatCubit extends Cubit<GetChatState> {
   GetChatCubit() : super(GetChatStateInitial());
 
-  Future<void> getChat(int chatId) async {
+  Future<void> getChat(String chatId) async {
     emit(GetChatStateLoading());
     final Either<Failure, ChatEntity> result =
         await sl<GetChatUseCase>().call(params: GetChatReq(chatId: chatId));

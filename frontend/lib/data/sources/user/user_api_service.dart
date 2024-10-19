@@ -14,20 +14,19 @@ class UserApiServiceImpl implements UserApiService {
   @override
   Future<void> updateUser(UpdateUserReq req) async {
     try {
-      final token = await sl<SharedPreferencesService>().getToken();
+      final accessToken = await sl<SharedPreferencesService>()
+          .getToken(TokenKeys.accessTokenKey);
       await sl<DioClient>().post(
         ApiUrls.updateUserRoleUrl,
         options: Options(
           headers: {
-            'Authorization': 'Bearer $token',
+            'Authorization': 'Bearer $accessToken',
           },
         ),
         data: req.toMap(),
       );
     } on DioException catch (e) {
       throw UpdateUserException(message: e.response!.data['message']);
-    } catch (_) {
-      rethrow;
     }
   }
 }

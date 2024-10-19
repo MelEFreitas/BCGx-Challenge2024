@@ -20,14 +20,17 @@ instructions = """
 
 qa_system_prompt = """
     You are a climate crisis specialist. Use the following context from retrieved documents to answer the user's question.
-
-    Context: {context}
-
+    Adapt your language to a person that is a {role} can undestand clearly.
+    
+    Context: {context},
+    
     Question: {question}
 """
 
 general_question_prompt_template = """
-    Você é um assistente treinado para identificar o tipo de pergunta. Diga apenas "Geral" se a pergunta for uma questão genérica e não precisa consultar documentos, ou "Específica" se a pergunta precisar de informações detalhadas de uma base de dados.
+    Você é um assistente treinado para identificar o tipo de pergunta. 
+    Classifique como "Geral" se a pergunta for APENAS um cumprimento do tipo "Oi/Olá/Bom dia/Obrigada", 
+    ou "Específica" se for alguma outra pergunta e precisar de informações detalhadas de uma base de dados.
 
     Pergunta: {question}
 
@@ -36,10 +39,14 @@ general_question_prompt_template = """
 
 score_threshold = 0.8
 
-llm = ChatOpenAI(temperature=0.5)
+llm = ChatOpenAI(model="gpt-4o",
+    temperature=0.7,
+    frequency_penalty=0.5,
+    presence_penalty=0.3,
+)
 embeddings = OpenAIEmbeddings()
 faiss = FAISS.load_local(faiss_index_path, embeddings, allow_dangerous_deserialization=True)
-retriever = faiss.as_retriever(search_type="similarity_score_threshold", search_kwargs={"score_threshold": score_threshold}, search_limit=5)
+retriever = faiss.as_retriever(search_type="similarity_score_threshold", search_kwargs={"score_threshold": 0.75, 'k':5})
 summary_memory = ConversationSummaryMemory(llm=OpenAI(), memory_key="summary_history")
 entity_memory = ConversationEntityMemory(llm=OpenAI(), memory_key="entity_info")
 memory = CombinedMemory(memories=[summary_memory, entity_memory])
@@ -120,15 +127,8 @@ def handle_specific_question(db_chat: ChatDB | None, question: str, role: str):
     if not context:
         return "Não possuo informações suficientes para responder."
     
-    # for doc in context:
-    #     print(doc)
-    # if context:
-    #     highest_score = max([doc.metadata['similarity_score'] for doc in context])
-
-    #     if highest_score < score_threshold:
-    #         return "Não possuo informações suficientes para responder."
-        
     ai_message = rag_chain.invoke({
+        "role": role,
         "question": question,
         "context": context[0],
         "chat_history": chat_history

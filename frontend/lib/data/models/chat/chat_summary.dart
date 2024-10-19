@@ -8,7 +8,7 @@ class ChatSummaryModel {
   ChatSummaryModel({required this.chatId, required this.title});
 
   @JsonKey(name: 'id')
-  final int chatId;
+  final String chatId;
   final String title;
 
   ChatSummaryEntity toEntity() {

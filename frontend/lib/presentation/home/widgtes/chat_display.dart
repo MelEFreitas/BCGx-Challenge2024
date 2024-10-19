@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/core/constants/theme.dart';
 import 'package:frontend/presentation/home/cubits/get_chat/get_chat_cubit.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ChatDisplay extends StatefulWidget {
   const ChatDisplay({super.key});
@@ -24,10 +26,12 @@ class _ChatDisplayState extends State<ChatDisplay> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     return BlocBuilder<GetChatCubit, GetChatState>(
       builder: (context, state) {
         if (state is GetChatStateInitial) {
-          return const Center(child: Text('Send a message to start a chat!'));
+          return Center(child: Text(localizations.startChat));
         } else if (state is GetChatStateFailure) {
           return Center(
               child: Text('Failed to load chat: ${state.errorMessage}'));
@@ -39,15 +43,12 @@ class _ChatDisplayState extends State<ChatDisplay> {
               .addPostFrameCallback((_) => _scrollToBottom());
 
           return ListView.builder(
-            controller: _scrollController, // Attach the ScrollController
+            controller: _scrollController,
             padding: const EdgeInsets.all(8.0),
-            itemCount: chat.conversation.length *
-                2, // Each question and answer is separate
+            itemCount: chat.conversation.length * 2,
             itemBuilder: (context, index) {
-              final qaIndex = index ~/
-                  2; // Dividing index by 2 to get the corresponding QuestionAnswerEntity
-              final isQuestion = index
-                  .isEven; // Even indices represent questions, odd ones represent answers
+              final qaIndex = index ~/ 2;
+              final isQuestion = index.isEven;
               final qa = chat.conversation[qaIndex];
 
               return Align(
@@ -55,17 +56,45 @@ class _ChatDisplayState extends State<ChatDisplay> {
                     isQuestion ? Alignment.centerRight : Alignment.centerLeft,
                 child: Padding(
                   padding: isQuestion
-                      ? const EdgeInsets.fromLTRB(400.0, 10.0, 10.0, 10.0)
-                      : const EdgeInsets.fromLTRB(10.0, 10.0, 400.0, 10.0),
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 4.0),
-                    padding: const EdgeInsets.all(10.0),
-                    decoration: BoxDecoration(
-                      color: isQuestion ? Colors.blue[100] : Colors.grey[300],
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: Text(isQuestion ? qa.question : qa.answer),
-                  ),
+                      ? EdgeInsets.fromLTRB(screenWidth > 900 ? screenWidth / 5 : screenWidth / 10, 10.0, screenWidth > 900 ? 20.0 : 10.0, 10.0)
+                      : EdgeInsets.fromLTRB(screenWidth > 900 ? 30.0 : 20.0, 10.0, screenWidth > 900 ? screenWidth / 10 : screenWidth / 50, 10.0),
+                  child: isQuestion ? 
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 4.0),
+                      padding: const EdgeInsets.all(10.0),
+                      decoration: BoxDecoration(
+                        color: isQuestion ? ThemeColors.logoLightOrange : ThemeColors.grey,
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Text(isQuestion ? qa.question : qa.answer, style: TextStyle(fontSize: screenWidth > 900 ? 19 : 17),),
+                    )
+                    : Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: ClipOval(
+                            child: Image.asset(
+                              'assets/small_icon.png',
+                              width: 40,
+                              height: 40,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        Flexible(
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(vertical: 4.0),
+                            padding: const EdgeInsets.all(10.0),
+                            decoration: BoxDecoration(
+                              color: isQuestion ? ThemeColors.logoLightOrange : ThemeColors.grey,
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            child: Text(isQuestion ? qa.question : qa.answer, style: TextStyle(fontSize: screenWidth > 900 ? 19 : 17),),
+                          ),
+                        )
+                      ],
+                    )
                 ),
               );
             },

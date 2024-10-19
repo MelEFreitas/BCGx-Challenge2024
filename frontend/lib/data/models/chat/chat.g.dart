@@ -13,7 +13,7 @@ ChatModel _$ChatModelFromJson(Map<String, dynamic> json) => $checkedCreate(
       json,
       ($checkedConvert) {
         final val = ChatModel(
-          id: $checkedConvert('id', (v) => (v as num).toInt()),
+          id: $checkedConvert('id', (v) => v as String),
           title: $checkedConvert('title', (v) => v as String),
           conversation: $checkedConvert(
               'conversation',

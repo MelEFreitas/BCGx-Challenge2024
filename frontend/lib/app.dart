@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -10,8 +12,6 @@ import 'package:frontend/presentation/home/cubits/delete_chat/delete_chat_cubit.
 import 'package:frontend/presentation/home/cubits/get_chat/get_chat_cubit.dart';
 import 'package:frontend/presentation/home/cubits/get_chat_summaries/get_chat_summaries_cubit.dart';
 import 'package:frontend/presentation/home/cubits/language/language_cubit.dart';
-import 'package:frontend/presentation/home/cubits/theme/theme_cubit.dart';
-import 'package:frontend/presentation/home/cubits/theme/theme_state.dart';
 import 'package:frontend/presentation/home/cubits/update_chat/update_chat_cubit.dart';
 import 'package:frontend/presentation/home/cubits/update_user/update_user_cubit.dart';
 import 'package:frontend/presentation/home/screens/home.dart';
@@ -24,9 +24,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<ThemeCubit>(
-          create: (context) => ThemeCubit(),
-        ),
         BlocProvider<AuthCubit>(
           create: (context) => AuthCubit(),
         ),
@@ -58,14 +55,13 @@ class MyApp extends StatelessWidget {
           create: (context) => LanguageCubit(),
         ),
       ],
-      child:
-          BlocBuilder<ThemeCubit, ThemeState>(builder: (context, themeState) {
-        final brightness = MediaQuery.of(context).platformBrightness;
-        context.read<ThemeCubit>().updateTheme(brightness);
-        return BlocBuilder<LanguageCubit, Locale>(
+      child: BlocBuilder<LanguageCubit, Locale>(
           builder: (context, locale) {
             return MaterialApp(
               debugShowCheckedModeBanner: false,
+              scrollBehavior: const MaterialScrollBehavior().copyWith(
+                dragDevices: {PointerDeviceKind.mouse},
+              ),
               locale: locale,
               localizationsDelegates: const [
                 AppLocalizations.delegate,
@@ -77,15 +73,11 @@ class MyApp extends StatelessWidget {
                 Locale('en'),
                 Locale('pt'),
               ],
-              title: 'BCGx Challenge',
-              theme: themeState.lightTheme,
-              darkTheme: themeState.darkTheme,
-              themeMode: themeState.themeMode,
+              title: 'GAIA',
               home: const AuthWrapper(),
             );
           },
-        );
-      }),
+      ),
     );
   }
 }

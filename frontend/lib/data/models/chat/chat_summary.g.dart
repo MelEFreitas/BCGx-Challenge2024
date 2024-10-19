@@ -14,7 +14,7 @@ ChatSummaryModel _$ChatSummaryModelFromJson(Map<String, dynamic> json) =>
       json,
       ($checkedConvert) {
         final val = ChatSummaryModel(
-          chatId: $checkedConvert('id', (v) => (v as num).toInt()),
+          chatId: $checkedConvert('id', (v) => v as String),
           title: $checkedConvert('title', (v) => v as String),
         );
         return val;

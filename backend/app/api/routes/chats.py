@@ -14,7 +14,7 @@ from app.api.routes.utils import ask_question_ai, create_chat_title
 router = APIRouter()
 
 @router.post("/chats", response_model=Chat, status_code=status.HTTP_201_CREATED)
-async def create_chat(
+def create_chat(
     chat: ChatCreate, db: Session = Depends(get_db), current_user: UserDB = Depends(get_current_user)
 ) -> Chat:
     """
@@ -46,7 +46,7 @@ async def create_chat(
 
 
 @router.post("/chats/{chat_id}", response_model=ChatContent, status_code=status.HTTP_200_OK)
-async def add_question_answer_to_chat(
+def add_question_answer_to_chat(
     chat_id: uuid.UUID, chat: ChatUpdate, db: Session = Depends(get_db), current_user: UserDB = Depends(get_current_user)
 ) -> ChatContent:
     """

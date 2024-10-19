@@ -4,7 +4,7 @@ class ChatEntity {
   ChatEntity(
       {required this.id, required this.title, required this.conversation});
 
-  final int id;
+  final String id;
   final String title;
   final List<QuestionAnswerEntity> conversation;
 }

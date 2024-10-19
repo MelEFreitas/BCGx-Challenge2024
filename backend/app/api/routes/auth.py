@@ -129,7 +129,7 @@ def refresh_access_token(
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to create the refresh token",
+            detail="Failed to create the access token",
             headers={"WWW-Authenticate": "Bearer"},
         )
 

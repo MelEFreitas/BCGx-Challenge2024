@@ -1,10 +1,12 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:frontend/core/constants/theme.dart';
 import 'package:frontend/presentation/auth/cubits/auth/auth_cubit.dart';
 import 'package:frontend/presentation/auth/cubits/sign_in/sign_in_cubit.dart';
 import 'package:frontend/presentation/auth/screens/sign_up.dart';
+import 'package:frontend/presentation/auth/widgets/auth_button.dart';
+import 'package:frontend/presentation/auth/widgets/auth_navigation_text.dart';
+import 'package:frontend/presentation/auth/widgets/common_text_field.dart';
 import 'package:frontend/presentation/home/cubits/language/language_cubit.dart';
 import 'package:frontend/presentation/home/widgtes/language_switcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -60,6 +62,7 @@ class _SignInScreenState extends State<SignInScreen> {
         context.watch<SignInCubit>().state is SignInStateLoading;
 
     return Scaffold(
+      backgroundColor: ThemeColors.lightGrey,
       appBar: AppBar(
         actions: const [
           LanguageSwitcherButton(),
@@ -94,7 +97,7 @@ class _SignInScreenState extends State<SignInScreen> {
           key: _signInFormKey,
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
               child: Center(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -103,7 +106,8 @@ class _SignInScreenState extends State<SignInScreen> {
                     Text(
                       localizations.signIn,
                       style: const TextStyle(
-                        fontSize: 32,
+                        color: ThemeColors.black,
+                        fontSize: 36,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,
@@ -111,87 +115,51 @@ class _SignInScreenState extends State<SignInScreen> {
                     const SizedBox(height: 20),
                     SizedBox(
                       width: textFieldWidth,
-                      child: TextFormField(
+                      child: CommonTextField(
                         controller: _emailCon,
-                        decoration: InputDecoration(
-                          labelText: localizations.email,
-                          hintText: localizations.emailHint,
-                          border: const OutlineInputBorder(),
-                          errorText: _emailError, // Error message from state
-                        ),
+                        labelText: localizations.email,
+                        hintText: localizations.emailHint,
+                        errorText: _emailError,
                       ),
                     ),
                     const SizedBox(height: 20),
                     SizedBox(
                       width: textFieldWidth,
-                      child: TextFormField(
+                      child: CommonTextField(
                         controller: _passwordCon,
-                        obscureText: !_isPasswordVisible,
-                        decoration: InputDecoration(
-                          labelText: localizations.password,
-                          hintText: localizations.passwordHint,
-                          border: const OutlineInputBorder(),
-                          errorText: _passwordError, // Error message from state
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _isPasswordVisible
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _isPasswordVisible = !_isPasswordVisible;
-                              });
-                            },
-                          ),
-                        ),
+                        labelText: localizations.password,
+                        hintText: localizations.passwordHint,
+                        errorText: _passwordError,
+                        isVisible: _isPasswordVisible,
+                        onToggleVisibility: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
+                        hasVisibilityToggle: true,
                       ),
                     ),
                     const SizedBox(height: 20),
-                    MouseRegion(
-                      cursor: SystemMouseCursors.click,
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
+                    AuthNavigationText(
+                      primaryText: localizations.dontHaveAccount,
+                      actionText: localizations.signUp,
+                      onTap: () {
+                        Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const SignUpScreen(),
-                            ),
-                          );
-                        },
-                        child: RichText(
-                          text: TextSpan(
-                            text: localizations.dontHaveAccount,
-                            style: const TextStyle(color: Colors.black),
-                            children: [
-                              TextSpan(
-                                text: localizations.signUp,
-                                style: const TextStyle(
-                                  color: Colors.blue,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                                builder: (context) => const SignUpScreen()));
+                      },
                     ),
                     const SizedBox(height: 20),
                     Center(
                       child: isLoading
-                          ? const CircularProgressIndicator()
-                          : ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 40, vertical: 16),
-                                backgroundColor: Colors.blue,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
+                          ? const CircularProgressIndicator(
+                            color: ThemeColors.logoOrange,
+                          )
+                          : AuthButton(
+                              buttonText: localizations.signIn,
                               onPressed: () {
                                 _validateForm(localizations);
-
                                 if (_emailError == null &&
                                     _passwordError == null) {
                                   final email = _emailCon.text.trim();
@@ -199,17 +167,9 @@ class _SignInScreenState extends State<SignInScreen> {
                                   context
                                       .read<SignInCubit>()
                                       .signIn(email, password);
-                                } else {
-                                  log('Sign In form validation failed');
                                 }
                               },
-                              child: Text(
-                                localizations.signIn,
-                                style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white),
-                              ),
+                              isLoading: isLoading,
                             ),
                     ),
                   ],

@@ -9,7 +9,7 @@ class ChatModel {
   ChatModel(
       {required this.id, required this.title, required this.conversation});
 
-  final int id;
+  final String id;
   final String title;
   final List<QuestionAnswerModel> conversation;
 

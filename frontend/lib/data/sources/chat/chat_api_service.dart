@@ -23,12 +23,13 @@ class ChatApiServiceImpl implements ChatApiService {
   @override
   Future<ChatModel> createChat(CreateChatReq req) async {
     try {
-      final token = await sl<SharedPreferencesService>().getToken();
+      final accessToken = await sl<SharedPreferencesService>()
+          .getToken(TokenKeys.accessTokenKey);
       final response = await sl<DioClient>().post(
         ApiUrls.chatUrl,
         options: Options(
           headers: {
-            'Authorization': 'Bearer $token',
+            'Authorization': 'Bearer $accessToken',
           },
         ),
         data: req.toMap(),
@@ -36,39 +37,37 @@ class ChatApiServiceImpl implements ChatApiService {
       return ChatModel.fromJson(response.data);
     } on DioException catch (e) {
       throw CreateChatException(message: e.response?.data['message']);
-    } catch (_) {
-      rethrow;
     }
   }
 
   @override
   Future<void> deleteChat(DeleteChatReq req) async {
     final String url = '${ApiUrls.chatUrl}/${req.chatId}';
-    final token = await sl<SharedPreferencesService>().getToken();
+    final accessToken =
+        await sl<SharedPreferencesService>().getToken(TokenKeys.accessTokenKey);
     try {
       await sl<DioClient>().delete(
         url,
         options: Options(
           headers: {
-            'Authorization': 'Bearer $token',
+            'Authorization': 'Bearer $accessToken',
           },
         ),
       );
     } on DioException catch (e) {
       throw DeleteChatException(message: e.response?.data['message']);
-    } catch (_) {
-      rethrow;
     }
   }
 
   @override
   Future<List<ChatSummaryModel>> getAllChatSummaries() async {
     try {
-      final token = await sl<SharedPreferencesService>().getToken();
+      final accessToken = await sl<SharedPreferencesService>()
+          .getToken(TokenKeys.accessTokenKey);
       final response = await sl<DioClient>().get(ApiUrls.chatUrl,
           options: Options(
             headers: {
-              'Authorization': 'Bearer $token',
+              'Authorization': 'Bearer $accessToken',
             },
           ));
       List<ChatSummaryModel> chatSummaries = (response.data as List)
@@ -78,8 +77,6 @@ class ChatApiServiceImpl implements ChatApiService {
       return chatSummaries;
     } on DioException catch (e) {
       throw GetAllChatSummariesException(message: e.response?.data['message']);
-    } catch (_) {
-      rethrow;
     }
   }
 
@@ -87,18 +84,17 @@ class ChatApiServiceImpl implements ChatApiService {
   Future<ChatModel> getChat(GetChatReq req) async {
     try {
       final String url = '${ApiUrls.chatUrl}/${req.chatId}';
-      final token = await sl<SharedPreferencesService>().getToken();
+      final accessToken = await sl<SharedPreferencesService>()
+          .getToken(TokenKeys.accessTokenKey);
       final response = await sl<DioClient>().get(url,
           options: Options(
             headers: {
-              'Authorization': 'Bearer $token',
+              'Authorization': 'Bearer $accessToken',
             },
           ));
       return ChatModel.fromJson(response.data);
     } on DioException catch (e) {
       throw GetChatException(message: e.response?.data['message']);
-    } catch (_) {
-      rethrow;
     }
   }
 
@@ -106,20 +102,19 @@ class ChatApiServiceImpl implements ChatApiService {
   Future<void> updateChat(UpdateChatReq req) async {
     try {
       final String url = '${ApiUrls.chatUrl}/${req.chatId}';
-      final token = await sl<SharedPreferencesService>().getToken();
+      final accessToken = await sl<SharedPreferencesService>()
+          .getToken(TokenKeys.accessTokenKey);
       await sl<DioClient>().post(
         url,
         options: Options(
           headers: {
-            'Authorization': 'Bearer $token',
+            'Authorization': 'Bearer $accessToken',
           },
         ),
         data: req.toMap(),
       );
     } on DioException catch (e) {
       throw UpdateChatException(message: e.response?.data['message']);
-    } catch (_) {
-      rethrow;
     }
   }
 }

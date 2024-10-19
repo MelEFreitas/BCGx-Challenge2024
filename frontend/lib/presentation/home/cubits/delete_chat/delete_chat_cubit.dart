@@ -11,7 +11,7 @@ part 'delete_chat_state.dart';
 class DeleteChatCubit extends Cubit<DeleteChatState> {
   DeleteChatCubit() : super(DeleteChatStateInitital());
 
-  Future<void> deleteChat(int chatId) async {
+  Future<void> deleteChat(String chatId) async {
     emit(DeleteChatStateLoading());
     final Either<Failure, void> result = await sl<DeleteChatUseCase>()
         .call(params: DeleteChatReq(chatId: chatId));
