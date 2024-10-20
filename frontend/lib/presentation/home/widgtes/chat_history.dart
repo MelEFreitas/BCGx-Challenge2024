@@ -74,8 +74,8 @@ class _HoverableChatTileState extends State<HoverableChatTile> {
   Widget build(BuildContext context) {
     const hoverColor = ThemeColors.lightGreenHover; // Color on hover
     final normalColor = widget.isSelected ? ThemeColors.lightGreen : Colors.transparent;
-    final borderColor = widget.isSelected ? ThemeColors.darkGreen : Colors.transparent;
-    final textColor = widget.isSelected ? ThemeColors.darkGreen : ThemeColors.lightGreen;
+    final borderColor = widget.isSelected ? ThemeColors.darkGreen : ThemeColors.lightGreen;
+    final textColor = widget.isSelected ? ThemeColors.darkGreen : ThemeColors.lightGrey;
 
     return MouseRegion(
       onEnter: (_) => setState(() => isHovered = true),
