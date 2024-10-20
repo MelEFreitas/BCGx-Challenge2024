@@ -8,6 +8,7 @@ import 'package:frontend/presentation/auth/widgets/auth_button.dart';
 import 'package:frontend/presentation/auth/widgets/auth_navigation_text.dart';
 import 'package:frontend/presentation/auth/widgets/common_text_field.dart';
 import 'package:frontend/presentation/auth/widgets/role_selector.dart';
+import 'package:frontend/presentation/auth/widgets/vitality_animation.dart';
 import 'package:frontend/presentation/home/cubits/language/language_cubit.dart';
 import 'package:frontend/presentation/home/widgtes/language_switcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -132,126 +133,131 @@ class _SignUpScreenState extends State<SignUpScreen> {
             },
           ),
         ],
-        child: Form(
-          key: _signUpFormKey,
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
-              child: Center(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const SizedBox(height: 40),
-                    Text(
-                      localizations.signUp,
-                      style: const TextStyle(
-                        color: ThemeColors.black,
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 20),
-                    SizedBox(
-                      width: textFieldWidth,
-                      child: CommonTextField(
-                        controller: _emailCon,
-                        labelText: localizations.email,
-                        hintText: localizations.emailHint,
-                        errorText: _emailError,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    SizedBox(
-                      width: textFieldWidth,
-                      child: CommonTextField(
-                        controller: _passwordCon,
-                        labelText: localizations.password,
-                        hintText: localizations.passwordHint,
-                        errorText: _passwordError,
-                        isVisible: _isPasswordVisible,
-                        onToggleVisibility: () {
-                          setState(() {
-                            _isPasswordVisible = !_isPasswordVisible;
-                          });
-                        },
-                        hasVisibilityToggle: true,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    SizedBox(
-                      width: textFieldWidth,
-                      child: CommonTextField(
-                        controller: _confirmPasswordCon,
-                        labelText: localizations.confirmPassword,
-                        hintText: localizations.confirmPasswordHint,
-                        errorText: _confirmPasswordError,
-                        isVisible: _isConfirmPasswordVisible,
-                        onToggleVisibility: () {
-                          setState(() {
-                            _isConfirmPasswordVisible =
-                                !_isConfirmPasswordVisible;
-                          });
-                        },
-                        hasVisibilityToggle: true,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      localizations.selectRole,
-                      style: const TextStyle(
-                        fontSize: 17
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: RoleSelector(
-                          roles: roles,
-                          selectedRole: _selectedRole,
-                          onRoleSelected: (index) {
-                            setState(() {
-                              _selectedRole = index;
-                            });
-                          },
-                        )),
-                    const SizedBox(height: 20),
-                    AuthNavigationText(
-                      primaryText: localizations.alreadyHaveAccount,
-                      actionText: localizations.signIn,
-                      onTap: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    Center(
-                      child: isLoading
-                          ? const CircularProgressIndicator(
-                            color: ThemeColors.logoOrange,
-                          )
-                          : AuthButton(
-                              buttonText: localizations.signUp,
-                              onPressed: () {
-                                _validateForm(localizations);
-                                if (_emailError == null &&
-                                    _passwordError == null &&
-                                    _confirmPasswordError == null) {
-                                  final email = _emailCon.text.trim();
-                                  final password = _passwordCon.text.trim();
-                                  final role = roles[_selectedRole]['title']!;
-                                  context
-                                      .read<SignUpCubit>()
-                                      .signUp(email, password, role);
-                                }
+        child: Stack(
+          children: [
+            const VitalityBackground(),
+            Form(
+              key: _signUpFormKey,
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                  child: Center(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 40),
+                        Text(
+                          localizations.signUp,
+                          style: const TextStyle(
+                            color: ThemeColors.black,
+                            fontSize: 36,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: textFieldWidth,
+                          child: CommonTextField(
+                            controller: _emailCon,
+                            labelText: localizations.email,
+                            hintText: localizations.emailHint,
+                            errorText: _emailError,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: textFieldWidth,
+                          child: CommonTextField(
+                            controller: _passwordCon,
+                            labelText: localizations.password,
+                            hintText: localizations.passwordHint,
+                            errorText: _passwordError,
+                            isVisible: _isPasswordVisible,
+                            onToggleVisibility: () {
+                              setState(() {
+                                _isPasswordVisible = !_isPasswordVisible;
+                              });
+                            },
+                            hasVisibilityToggle: true,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: textFieldWidth,
+                          child: CommonTextField(
+                            controller: _confirmPasswordCon,
+                            labelText: localizations.confirmPassword,
+                            hintText: localizations.confirmPasswordHint,
+                            errorText: _confirmPasswordError,
+                            isVisible: _isConfirmPasswordVisible,
+                            onToggleVisibility: () {
+                              setState(() {
+                                _isConfirmPasswordVisible =
+                                    !_isConfirmPasswordVisible;
+                              });
+                            },
+                            hasVisibilityToggle: true,
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          localizations.selectRole,
+                          style: const TextStyle(
+                            fontSize: 17
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: RoleSelector(
+                              roles: roles,
+                              selectedRole: _selectedRole,
+                              onRoleSelected: (index) {
+                                setState(() {
+                                  _selectedRole = index;
+                                });
                               },
-                              isLoading: isLoading,
-                            ),
+                            )),
+                        const SizedBox(height: 20),
+                        AuthNavigationText(
+                          primaryText: localizations.alreadyHaveAccount,
+                          actionText: localizations.signIn,
+                          onTap: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                        const SizedBox(height: 20),
+                        Center(
+                          child: isLoading
+                              ? const CircularProgressIndicator(
+                                color: ThemeColors.logoOrange,
+                              )
+                              : AuthButton(
+                                  buttonText: localizations.signUp,
+                                  onPressed: () {
+                                    _validateForm(localizations);
+                                    if (_emailError == null &&
+                                        _passwordError == null &&
+                                        _confirmPasswordError == null) {
+                                      final email = _emailCon.text.trim();
+                                      final password = _passwordCon.text.trim();
+                                      final role = roles[_selectedRole]['title']!;
+                                      context
+                                          .read<SignUpCubit>()
+                                          .signUp(email, password, role);
+                                    }
+                                  },
+                                  isLoading: isLoading,
+                                ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );

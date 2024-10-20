@@ -5,7 +5,14 @@ import 'package:frontend/data/sources/auth/auth_local_service.dart';
 import 'package:frontend/service_locator.dart';
 import 'package:logger/logger.dart';
 
+/// A Dio interceptor for logging HTTP requests, responses, and errors.
+///
+/// The [LoggerInterceptor] class logs the details of requests, responses,
+/// and errors to help with debugging and monitoring the HTTP interactions.
+/// It extends the [Interceptor] class and overrides the methods for
+/// handling requests, responses, and errors.
 class LoggerInterceptor extends Interceptor {
+  /// Creates an instance of [LoggerInterceptor].
   Logger logger = Logger(
       printer: PrettyPrinter(methodCount: 0, colors: true, printEmojis: false));
 
@@ -45,13 +52,19 @@ class LoggerInterceptor extends Interceptor {
   }
 }
 
+/// A Dio interceptor for handling token expiration and refreshing access tokens.
+///
+/// The [TokenInterceptor] class checks for 403 Forbidden errors, attempts
+/// to refresh the access token using a refresh token, and retries the original
+/// request with the new access token. It extends the [Interceptor] class
+/// to provide custom error handling and token management.
 class TokenInterceptor extends Interceptor {
   final Dio tokenDio = Dio();
 
   @override
   Future onError(DioException err, ErrorInterceptorHandler handler) async {
-    // Check if the error was a 401(Unauthorized) and the access token is expired
-    if (err.response?.statusCode == 401) {
+    // Check if the error was a 403 (Forbidden) and the access token is expired
+    if (err.response?.statusCode == 403) {
       final refreshToken = await sl<SharedPreferencesService>()
           .getToken(TokenKeys.refreshTokenKey);
       if (refreshToken != null) {
@@ -68,11 +81,14 @@ class TokenInterceptor extends Interceptor {
         }
       }
     }
-    // If it's not a 401 or no refresh token is available, just forward the error
+    // If it's not a 403 or no refresh token is available, just forward the error
     return super.onError(err, handler);
   }
 
-  // Method to refresh the token
+  /// Refreshes the access token using the provided refresh token.
+  ///
+  /// Takes a [refreshToken] string and returns a map containing the new
+  /// access token if successful, or null if the refresh fails.
   Future<Map<String, dynamic>?> _refreshToken(String refreshToken) async {
     try {
       final response = await tokenDio.post(
@@ -80,6 +96,9 @@ class TokenInterceptor extends Interceptor {
         data: {
           'refresh_token': refreshToken,
         },
+        options: Options(
+          headers: {'Authorization': 'Bearer $refreshToken'}, 
+        )
       );
       return response.data;
     } catch (e) {
@@ -88,7 +107,10 @@ class TokenInterceptor extends Interceptor {
     }
   }
 
-  // Method to retry the original request with the new token
+  /// Retries the original request with a new access token.
+  ///
+  /// Takes the original [requestOptions] and returns the response of the
+  /// retried request.
   Future<Response> _retryRequest(RequestOptions requestOptions) async {
     final accessToken =
         await sl<SharedPreferencesService>().getToken(TokenKeys.accessTokenKey);

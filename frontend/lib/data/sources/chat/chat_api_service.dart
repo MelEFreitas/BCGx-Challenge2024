@@ -11,15 +11,46 @@ import 'package:frontend/data/models/chat/get_chat_req.dart';
 import 'package:frontend/data/models/chat/update_chat_req.dart';
 import 'package:frontend/service_locator.dart';
 
+/// An abstract class that defines the API service operations for chat functionalities.
 abstract class ChatApiService {
+  /// Retrieves all chat summaries.
+  ///
+  /// Returns a list of [ChatSummaryModel].
+  /// Throws [GetAllChatSummariesException] if the retrieval fails.
   Future<List<ChatSummaryModel>> getAllChatSummaries();
+
+  /// Retrieves a specific chat based on the provided [req].
+  ///
+  /// Returns a [ChatModel] if the chat is found.
+  /// Throws [GetChatException] if the retrieval fails.
   Future<ChatModel> getChat(GetChatReq req);
+
+  /// Creates a new chat using the provided [req].
+  ///
+  /// Returns the newly created [ChatModel].
+  /// Throws [CreateChatException] if the creation fails.
   Future<ChatModel> createChat(CreateChatReq req);
+
+  /// Deletes a chat based on the provided [req].
+  ///
+  /// Throws [DeleteChatException] if the deletion fails.
   Future<void> deleteChat(DeleteChatReq req);
+
+  /// Updates an existing chat based on the provided [req].
+  ///
+  /// Throws [UpdateChatException] if the update fails.
   Future<void> updateChat(UpdateChatReq req);
 }
 
+/// Implementation of the [ChatApiService] interface.
+///
+/// This class manages chat-related API calls such as retrieving chat summaries, creating chats, deleting chats, and updating chats.
 class ChatApiServiceImpl implements ChatApiService {
+  /// Creates a new chat using the provided [req].
+  ///
+  /// Retrieves the access token and sends a POST request to create a chat.
+  /// Returns a [ChatModel] if the creation is successful.
+  /// Throws a [CreateChatException] if the creation process encounters an error.
   @override
   Future<ChatModel> createChat(CreateChatReq req) async {
     try {
@@ -40,6 +71,10 @@ class ChatApiServiceImpl implements ChatApiService {
     }
   }
 
+  /// Deletes a chat based on the provided [req].
+  ///
+  /// Constructs the URL using the chat ID and sends a DELETE request.
+  /// Throws a [DeleteChatException] if the deletion process encounters an error.
   @override
   Future<void> deleteChat(DeleteChatReq req) async {
     final String url = '${ApiUrls.chatUrl}/${req.chatId}';
@@ -59,6 +94,11 @@ class ChatApiServiceImpl implements ChatApiService {
     }
   }
 
+  /// Retrieves all chat summaries.
+  ///
+  /// Sends a GET request to retrieve the chat summaries.
+  /// Returns a list of [ChatSummaryModel] if successful.
+  /// Throws a [GetAllChatSummariesException] if the retrieval process encounters an error.
   @override
   Future<List<ChatSummaryModel>> getAllChatSummaries() async {
     try {
@@ -80,6 +120,11 @@ class ChatApiServiceImpl implements ChatApiService {
     }
   }
 
+  /// Retrieves a specific chat based on the provided [req].
+  ///
+  /// Constructs the URL using the chat ID and sends a GET request.
+  /// Returns a [ChatModel] if the retrieval is successful.
+  /// Throws a [GetChatException] if the retrieval process encounters an error.
   @override
   Future<ChatModel> getChat(GetChatReq req) async {
     try {
@@ -98,6 +143,10 @@ class ChatApiServiceImpl implements ChatApiService {
     }
   }
 
+  /// Updates an existing chat based on the provided [req].
+  ///
+  /// Constructs the URL using the chat ID and sends a POST request with updated data.
+  /// Throws a [UpdateChatException] if the update process encounters an error.
   @override
   Future<void> updateChat(UpdateChatReq req) async {
     try {

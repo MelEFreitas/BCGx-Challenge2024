@@ -160,15 +160,15 @@ def get_current_user(
     """
     try:
         payload = decode_access_token(token)
-    except (JWTError, JWTClaimsError):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-        )
     except ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Access token has expired. Please refresh your token.",
+        )
+    except (JWTError, JWTClaimsError):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
         )
 
     email = payload.get("sub")

@@ -17,6 +17,25 @@ import 'package:frontend/presentation/home/cubits/update_user/update_user_cubit.
 import 'package:frontend/presentation/home/screens/home.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+/// The main entry point of the application.
+///
+/// This widget initializes and provides the necessary [Bloc] instances
+/// to the widget tree using [MultiBlocProvider]. It also sets up
+/// localization support for the application.
+///
+/// The following [Bloc]s are provided:
+/// - [AuthCubit]: Manages authentication state.
+/// - [SignInCubit]: Manages the sign-in process.
+/// - [SignUpCubit]: Manages the sign-up process.
+/// - [GetChatSummariesCubit]: Fetches chat summaries.
+/// - [CreateChatCubit]: Handles the creation of new chats.
+/// - [DeleteChatCubit]: Manages chat deletion.
+/// - [UpdateChatCubit]: Handles updates to existing chats.
+/// - [GetChatCubit]: Retrieves individual chat details.
+/// - [UpdateUserCubit]: Manages user updates.
+/// - [LanguageCubit]: Handles language changes in the app.
+///
+/// The application supports English and Portuguese languages.
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -82,6 +101,14 @@ class MyApp extends StatelessWidget {
   }
 }
 
+/// A widget that wraps the authentication logic and displays the appropriate screen
+/// based on the authentication state.
+///
+/// This widget uses a [BlocBuilder] to listen to the [AuthCubit] and rebuilds
+/// the UI based on the current [AuthState].
+///
+/// If the user is authenticated, it displays the [HomeScreen].
+/// If the user is not authenticated, it shows the [SignInScreen].
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
 

@@ -23,6 +23,39 @@ import 'package:get_it/get_it.dart';
 
 final sl = GetIt.instance;
 
+/// Initializes and registers the application dependencies using the GetIt package.
+///
+/// This function is responsible for setting up the dependency injection
+/// container and registering various services, repositories, and use cases
+/// required for the application to function properly.
+///
+/// The following components are registered:
+/// 
+/// - **HTTP Client**: 
+///   - [DioClient]: A singleton instance of the Dio HTTP client for making network requests.
+/// 
+/// - **Services**:
+///   - [SharedPreferencesService]: A service for managing local storage preferences.
+///   - [AuthApiService]: A service for handling authentication-related API calls.
+///   - [AuthLocalService]: A service for handling local authentication data.
+///   - [ChatApiService]: A service for managing chat-related API calls.
+///   - [UserApiService]: A service for managing user-related API calls.
+/// 
+/// - **Repositories**:
+///   - [AuthRepository]: A repository for managing authentication data and actions.
+///   - [ChatRepository]: A repository for managing chat data and actions.
+///   - [UserRepository]: A repository for managing user data and actions.
+/// 
+/// - **Use Cases**:
+///   - [SignInUseCase]: Use case for handling user sign-in operations.
+///   - [SignUpUseCase]: Use case for handling user sign-up operations.
+///   - [AuthUserUseCase]: Use case for managing user authentication state.
+///   - [CreateChatUseCase]: Use case for creating new chat instances.
+///   - [DeleteChatUseCase]: Use case for deleting existing chats.
+///   - [UpdateChatUseCase]: Use case for updating chat information.
+///   - [GetChatUseCase]: Use case for retrieving a specific chat.
+///   - [GetAllChatSummariesUseCase]: Use case for retrieving summaries of all chats.
+///   - [UpdateUserUsecase]: Use case for updating user information.
 Future<void> initializeDependencies() async {
   // HTTP Client
   sl.registerSingleton<DioClient>(DioClient());

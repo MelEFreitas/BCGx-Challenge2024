@@ -30,9 +30,7 @@ class _ChatDisplayState extends State<ChatDisplay> {
     final screenWidth = MediaQuery.sizeOf(context).width;
     return BlocBuilder<GetChatCubit, GetChatState>(
       builder: (context, state) {
-        if (state is GetChatStateInitial) {
-          return Center(child: Text(localizations.startChat));
-        } else if (state is GetChatStateFailure) {
+        if (state is GetChatStateFailure) {
           return Center(
               child: Text('Failed to load chat: ${state.errorMessage}'));
         } else if (state is GetChatStateSuccess) {
@@ -100,8 +98,12 @@ class _ChatDisplayState extends State<ChatDisplay> {
             },
           );
         } else {
-          return const Center(child: Text(''));
+          return Center(child: Text(localizations.startChat));
         }
+        
+        //else {
+          //return const Center(child: Text(''));
+        //}
       },
     );
   }

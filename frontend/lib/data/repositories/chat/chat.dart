@@ -11,7 +11,16 @@ import 'package:frontend/domain/entities/chat/chat_summary.dart';
 import 'package:frontend/domain/repositories/chat/chat.dart';
 import 'package:frontend/service_locator.dart';
 
+/// Implementation of the [ChatRepository] interface.
+///
+/// This class manages chat-related operations, such as creating, 
+/// deleting, updating, and retrieving chat entities. It communicates
+/// with the [ChatApiService] to perform necessary API calls.
 class ChatRepositoryImpl implements ChatRepository {
+  /// Creates a new chat using the provided [CreateChatReq] request.
+  ///
+  /// Returns an [Either] containing a [Failure] if an error occurs,
+  /// or the created [ChatEntity] if successful.
   @override
   Future<Either<Failure, ChatEntity>> createChat(CreateChatReq req) async {
     try {
@@ -24,6 +33,10 @@ class ChatRepositoryImpl implements ChatRepository {
     }
   }
 
+  /// Deletes a chat based on the provided [DeleteChatReq] request.
+  ///
+  /// Returns an [Either] containing a [Failure] if an error occurs,
+  /// or `void` if the deletion is successful.
   @override
   Future<Either<Failure, void>> deleteChat(DeleteChatReq req) async {
     try {
@@ -35,6 +48,10 @@ class ChatRepositoryImpl implements ChatRepository {
     }
   }
 
+  /// Retrieves all chat summaries.
+  ///
+  /// Returns an [Either] containing a [Failure] if an error occurs,
+  /// or a list of [ChatSummaryEntity] if successful.
   @override
   Future<Either<Failure, List<ChatSummaryEntity>>> getAllChatSummaries() async {
     try {
@@ -49,6 +66,10 @@ class ChatRepositoryImpl implements ChatRepository {
     }
   }
 
+  /// Retrieves a chat based on the provided [GetChatReq] request.
+  ///
+  /// Returns an [Either] containing a [Failure] if an error occurs,
+  /// or the corresponding [ChatEntity] if successful.
   @override
   Future<Either<Failure, ChatEntity>> getChat(GetChatReq req) async {
     try {
@@ -61,6 +82,10 @@ class ChatRepositoryImpl implements ChatRepository {
     }
   }
 
+  /// Updates an existing chat using the provided [UpdateChatReq] request.
+  ///
+  /// Returns an [Either] containing a [Failure] if an error occurs,
+  /// or `void` if the update is successful.
   @override
   Future<Either<Failure, void>> updateChat(UpdateChatReq req) async {
     try {
