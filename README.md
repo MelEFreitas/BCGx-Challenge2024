@@ -1,8 +1,6 @@
 # GAIA
 <img align="left" src="frontend/assets/logo.png" alt="BedTime logo" width="200" height="133">
-<br><br>GAIA, derived from *Gestão Ambiental com Inteligência Artificial*, is a cutting-edge Generative AI tool specializing in the climate and environmental landscape of Brazil. ts mission is to empower citizens with accessible knowledge of the latest laws and regulations regarding Brazil's climate and environment, regardless of their level of expertise. Leveraging over 1,500 pages of official documents, GAIA is designed to assist users in several key areas:
-
-<br>
+GAIA, derived from *Gestão Ambiental com Inteligência Artificial*, is a cutting-edge Generative AI tool specializing in the climate and environmental landscape of Brazil. ts mission is to empower citizens with accessible knowledge of the latest laws and regulations regarding Brazil's climate and environment, regardless of their level of expertise. Leveraging over 1,500 pages of official documents, GAIA is designed to assist users in several key areas:
 
 - **Understanding Climate and Environmental Topics:** GAIA provides insights into various climate-related subjects, curiosities, and facts to enhance users’ awareness and knowledge.
 -  **Guidance for Public Managers:** Local government officials can utilize GAIA to learn how to adapt their towns and cities to comply with current regulations and strategic plans, ensuring sustainable development within their communities.
