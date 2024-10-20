@@ -16,10 +16,12 @@ class Chatbot:
     def __init__(self, openai_api_key: str, faiss_index_path: str, role:str):
         """Inicializa o chatbot com recuperação de documentos e gerenciamento de contexto"""
         # Configurar o modelo OpenAI
+        #self.role = role
+        
         self.llm = ChatOpenAI(model="gpt-4o",
-                              temperature=0.7,  # Ajuste da criatividade
-                              frequency_penalty=0.5,  # Penalidade por repetição de palavras
-                              presence_penalty=0.3,  # Incentiva variedade de palavras
+                              temperature=0.5,  # Ajuste da criatividade
+                              frequency_penalty=0.7,  # Penalidade por repetição de palavras
+                              presence_penalty=0.5,  # Incentiva variedade de palavras
                               )
         
         #Creating Embeddings
@@ -39,18 +41,30 @@ class Chatbot:
 
         # Inicializar cadeias de prompts
         self._init_prompt_chains()
+        
+        # Função para criar o System Message de acordo com a role
+    def get_system_message(self,role):
+        role_based_instructions = {
+            "usuário padrão": "Explique de forma simples e acessível.",
+            "especialista ambiental": "Forneça detalhes técnicos e termos ambientais específicos.",
+            "gerente municipal": "Foque em ações práticas e implementáveis no nível municipal."
+        }
+        return SystemMessage(content=role_based_instructions.get(role, "Explique de forma simples."))
+
 
     def _init_prompt_chains(self):
         """Inicializa os prompts para o LLM e a recuperação de documentos"""
         # Instruções para perguntas baseadas no histórico da conversa
         instructions = """
         You are a knowledgeable assistant. Answer the questions based on the ongoing conversation.
+        
+        Chat History: {chat_history}
         """
 
         question_maker_prompt = ChatPromptTemplate(
             [
                 ("system", instructions),
-                MessagesPlaceholder(variable_name="chat_history"),
+               MessagesPlaceholder(variable_name="chat_history"),
                 ("human", "{question}"),
             ]
         )
@@ -64,10 +78,12 @@ class Chatbot:
 
         # Cadeia de prompts para o sistema de QA com recuperação de documentos
         qa_system_prompt = """
-        You are a climate crisis specialist. Use the following context from retrieved documents to answer the user's question.
-        Adapt your language to a person that is a {role} can undestand clearly.
-        
+        You are a climate crisis specialist. 
+        Use the following context from retrieved documents and, if you think is useful,
+        the chat history to answer the user's question.
         Context: {context},
+        
+        Chat History: {chat_history}, 
         
         Question: {question}
         
@@ -83,20 +99,22 @@ class Chatbot:
         
         self.rag_chain = (
             self.retriever_chain
-            | qa_prompt
+            | (lambda inputs: {
+                "context": self.get_system_message("especialista ambiental").content, 
+                "chat_history": self.chat_history,  # Incluindo o histórico diretamente
+                **inputs
+            })
+            | qa_prompt  # Garantir que o prompt usa o histórico
             | self.llm
             | StrOutputParser()
         )
 
         # Prompt de classificação de perguntas
         general_question_prompt_template = """
-        Você é um assistente treinado para identificar o tipo de pergunta. 
-        Classifique como "Geral" se a pergunta for APENAS um cumprimento do tipo "Oi/Olá/Bom dia/Obrigada", 
-        ou "Específica" se for alguma outra pergunta e precisar de informações detalhadas de uma base de dados.
-
+        Você é um assistente treinado para identificar o tipo de pergunta. Diga apenas "Geral" se a pergunta for uma questão genérica e não precisa consultar documentos, ou "Específica" se a pergunta precisar de informações detalhadas de uma base de dados.
         Pergunta: {question}
-
         Classificação:
+        
         """
         question_classifier_prompt = ChatPromptTemplate.from_template(general_question_prompt_template)
 
@@ -137,11 +155,6 @@ class Chatbot:
             return "I don't have enough information to answer this question. \
                     Can you reformulate your question or ask anything else?", None, self.chat_history
         
-        encoding = tiktoken.encoding_for_model("gpt-4o")
-
-        total_tokens = sum(len(encoding.encode(str(c))) for c in context[0])  # Convertendo para string
-        #print(f"Total tokens: {total_tokens}")  # Adicione esta linha para verificar o total de tokens
-        
         ai_message = self.rag_chain.invoke({
             "question": question,
             "context": context[0],
@@ -163,33 +176,4 @@ class Chatbot:
         elif question_type == "específica":
             return self.handle_specific_question(question)
 
-    def run_chat(self, question: str):
-        """
-        Método principal que decide se a pergunta é geral ou específica e processa adequadamente.
-        """
-        question_type = self.detect_question_type(question)
-        #chat_history = [AIMessage(content="Hi there, how can I help you today?")]
-        
-        if question_type == "geral":
-            # Para perguntas gerais, só usa o LLM
-            ai_message = self.llm.predict(f"Pergunta: {question}")
-            #chat_history.extend([HumanMessage(content=question), AIMessage(content=ai_message)])
-            
-            return ai_message, None, self.chat_history
-
-        elif question_type == "específica":
-            # Para perguntas específicas, usa documentos embasados
-            context = self.retriever.get_relevant_documents(question)
-            
-            # Ajustar a chave de entrada para conter apenas 'question' e 'context'
-            ai_message = self.rag_chain.invoke({
-                "question": question,  # Apenas 'question'
-                "context": context,
-                "chat_history": self.chat_history
-            })
-
-            # Atualizar o histórico de chat
-            self.chat_history.extend([HumanMessage(content=question), AIMessage(content=ai_message)])
-
-            # Retornar a resposta e os documentos relevantes
-            return ai_message, context, self.chat_history
+    
