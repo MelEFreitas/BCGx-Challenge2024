@@ -7,11 +7,16 @@ import 'package:frontend/presentation/auth/screens/sign_up.dart';
 import 'package:frontend/presentation/auth/widgets/auth_button.dart';
 import 'package:frontend/presentation/auth/widgets/auth_navigation_text.dart';
 import 'package:frontend/presentation/auth/widgets/common_text_field.dart';
-import 'package:frontend/presentation/auth/widgets/vitality_animation.dart';
 import 'package:frontend/presentation/home/cubits/language/language_cubit.dart';
 import 'package:frontend/presentation/home/widgtes/language_switcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+/// A screen that allows users to sign in to their accounts.
+///
+/// This screen includes fields for email and password,
+/// as well as a button to navigate to the sign-up page. 
+/// It provides input validation for the email and password fields
+/// and interacts with the SignInCubit to manage authentication processes.
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
 
@@ -30,6 +35,10 @@ class _SignInScreenState extends State<SignInScreen> {
   String? _emailError;
   String? _passwordError;
 
+  /// Validates the input fields in the sign-in form.
+  ///
+  /// This method checks if the email is empty or has an invalid format,
+  /// and if the password meets the required criteria.
   void _validateForm(AppLocalizations localizations) {
     setState(() {
       final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
@@ -96,7 +105,6 @@ class _SignInScreenState extends State<SignInScreen> {
         ],
         child: Stack(
           children: [ 
-            const VitalityBackground(),
             Form(
               key: _signInFormKey,
               child: SingleChildScrollView(

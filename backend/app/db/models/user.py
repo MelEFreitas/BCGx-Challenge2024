@@ -20,8 +20,8 @@ class UserDB(Base):
     __tablename__ = "users"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    email = Column(String(length=64), unique=True, index=True)
+    email = Column(String(length=63), unique=True, index=True)
     hashed_password = Column(String, nullable=False)
-    role = Column(String(length=64), nullable=False)
+    role = Column(String(length=63), nullable=False)
     
     chats = relationship("ChatDB", back_populates="user")

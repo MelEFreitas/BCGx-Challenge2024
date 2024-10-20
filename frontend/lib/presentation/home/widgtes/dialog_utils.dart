@@ -90,8 +90,10 @@ void showChangeRoleDialog(BuildContext context) {
     },
   ];
 
+  final List<String> defaultRoles = ["User", "Manager", "Environmental Analyst"];
+
   int selectedRoleIndex =
-      roles.indexWhere((role) => role['title'] == currentRole);
+      defaultRoles.indexWhere((role) => role == currentRole);
 
   showDialog(
     context: context,
@@ -158,7 +160,7 @@ void showChangeRoleDialog(BuildContext context) {
             }
           ),
           DialogButton(label: localizations.submit, backgroundColor: ThemeColors.orange, onPressed: () async {
-              String newRole = roles[selectedRoleIndex]['title']!;
+              String newRole = defaultRoles[selectedRoleIndex];
               await context.read<UpdateUserCubit>().updateUser(newRole);
               if (context.mounted) {
                 await context.read<AuthCubit>().authenticateUser();

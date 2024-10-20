@@ -17,6 +17,7 @@ class QuestionAnswerDB(Base):
         created_at (DateTime): The timestamp when the question-answer pair was created, automatically set to the current time.
         chat_id (UUID): The unique identifier of the chat session to which this question-answer pair belongs.
         chat (relationship): The relationship to the `ChatDB` model, representing the chat session.
+        answer_metadata (relationship): The relationship to the `AnswerMetadataDB` model, representing the metadata used by the LLM to provide the answer.
     """
 
     __tablename__ = "question_answers"
@@ -28,3 +29,4 @@ class QuestionAnswerDB(Base):
     chat_id = Column(UUID(as_uuid=True), ForeignKey('chats.id', ondelete="CASCADE"), nullable=False)
     
     chat = relationship("ChatDB", back_populates="conversation")
+    answer_metadatas = relationship("AnswerMetadataDB", back_populates="question_answer", cascade="all, delete-orphan")

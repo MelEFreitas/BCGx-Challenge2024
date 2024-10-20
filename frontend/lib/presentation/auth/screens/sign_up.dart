@@ -8,11 +8,16 @@ import 'package:frontend/presentation/auth/widgets/auth_button.dart';
 import 'package:frontend/presentation/auth/widgets/auth_navigation_text.dart';
 import 'package:frontend/presentation/auth/widgets/common_text_field.dart';
 import 'package:frontend/presentation/auth/widgets/role_selector.dart';
-import 'package:frontend/presentation/auth/widgets/vitality_animation.dart';
 import 'package:frontend/presentation/home/cubits/language/language_cubit.dart';
 import 'package:frontend/presentation/home/widgtes/language_switcher.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+/// A screen that allows users to sign up for an account.
+///
+/// This screen includes fields for email, password, and confirmation password,
+/// as well as a role selector. It provides validation for input fields
+/// and handles the signup process via the SignUpCubit. Users can also
+/// navigate to the sign-in screen from this page.
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
@@ -35,6 +40,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
   String? _passwordError;
   String? _confirmPasswordError;
 
+  /// Validates the input fields in the form.
+  ///
+  /// This method checks if the email is empty or has an invalid format,
+  /// if the password meets the required criteria, and if the confirm
+  /// password matches the password.
   void _validateForm(AppLocalizations localizations) {
     setState(() {
       final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
@@ -91,6 +101,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       },
     ];
 
+    final List<String> defaultRoles = ["User", "Manager", "Environmental Analyst"];
+
     return Scaffold(
       backgroundColor: ThemeColors.lightGrey,
       appBar: AppBar(
@@ -135,7 +147,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ],
         child: Stack(
           children: [
-            const VitalityBackground(),
             Form(
               key: _signUpFormKey,
               child: SingleChildScrollView(
@@ -242,7 +253,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         _confirmPasswordError == null) {
                                       final email = _emailCon.text.trim();
                                       final password = _passwordCon.text.trim();
-                                      final role = roles[_selectedRole]['title']!;
+                                      final role = defaultRoles[_selectedRole];
                                       context
                                           .read<SignUpCubit>()
                                           .signUp(email, password, role);

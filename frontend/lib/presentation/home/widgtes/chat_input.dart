@@ -17,17 +17,6 @@ class ChatInputField extends StatefulWidget {
 class _ChatInputFieldState extends State<ChatInputField> {
   final TextEditingController messageController = TextEditingController();
 
-  final List<String> words = [
-    'Climate',
-    'Energy',
-    'Pollution',
-    'Waste',
-    'Green',
-    'Water'
-  ];
-
-  List<String> selectedWords = [];
-
   @override
   Widget build(BuildContext context) {
     final localizations = AppLocalizations.of(context)!;
@@ -43,34 +32,6 @@ class _ChatInputFieldState extends State<ChatInputField> {
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: words.map((word) {
-                    final bool isSelected = selectedWords.contains(word);
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: ChoiceChip(
-                        label: Text(word),
-                        selected: isSelected,
-                        onSelected: (selected) {
-                          setState(() {
-                            if (selected && selectedWords.length < 3) {
-                              // Add the word to the selectedWords if less than 3 are selected
-                              selectedWords.add(word);
-                            } else if (!selected) {
-                              // Remove the word if it is deselected
-                              selectedWords.remove(word);
-                            }
-                          });
-                        },
-                        selectedColor: Colors.blue[100],
-                        backgroundColor: Colors.grey[200],
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
               const SizedBox(height: 20),
               Row(
                 children: [
@@ -121,19 +82,13 @@ class _ChatInputFieldState extends State<ChatInputField> {
                             : () async {
                                 final message = messageController.text.trim();
 
-                                final combinedMessage =
-                                    (selectedWords.isNotEmpty
-                                            ? '${selectedWords.join(', ')}: '
-                                            : '') +
-                                        message;
-
                                 if (message.isEmpty) return;
 
                                 if (getChatState is GetChatStateSuccess) {
                                   final chatId = getChatState.chat.id;
                                   await context
                                       .read<UpdateChatCubit>()
-                                      .updateChat(chatId, combinedMessage);
+                                      .updateChat(chatId, message);
                                   if (context.mounted) {
                                     await context
                                         .read<GetChatCubit>()
@@ -143,7 +98,7 @@ class _ChatInputFieldState extends State<ChatInputField> {
                                     is GetChatStateInitial) {
                                   await context
                                       .read<CreateChatCubit>()
-                                      .createChat(combinedMessage);
+                                      .createChat(message);
                                   if (context.mounted) {
                                     await context
                                         .read<GetChatSummariesCubit>()

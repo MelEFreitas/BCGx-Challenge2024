@@ -22,7 +22,7 @@ class ChatDB(Base):
     __tablename__ = "chats"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    title = Column(String(length=64), nullable=False)
+    title = Column(String(length=63), nullable=False)
     created_at = Column(DateTime, server_default=func.now())
     user_id = Column(UUID(as_uuid=True), ForeignKey('users.id'), nullable=False)
 

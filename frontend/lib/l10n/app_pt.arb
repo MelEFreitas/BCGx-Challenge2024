@@ -39,5 +39,8 @@
   "managerTitle": "Gestor",
   "managerDescription": "GaIA vai te ajudar a entender as leis e planos atuais.",
   "envAnalystTitle": "Analista Ambiental",
-  "envAnalystDescription": "Uma conversa técnica e rica em detalhes é o que você está procurando."
+  "envAnalystDescription": "Uma conversa técnica e rica em detalhes é o que você está procurando.",
+  "source": "Referências:",
+  "doc": "Documento:",
+  "page": "Página:"
 }

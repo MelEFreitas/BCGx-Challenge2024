@@ -1,5 +1,17 @@
+from typing import List
 import uuid
 from pydantic import BaseModel
+
+class AnswerMetadata(BaseModel):
+    """
+    Metadata model with three named fields.
+    
+    Attributes:
+        page_number (str): The number of the page where the answer was taken from.
+        file_name (str): The name of the document that contained the answer.
+    """
+    page_number: str | None
+    file_name: str | None
 
 
 class QuestionAnswerBase(BaseModel):
@@ -9,9 +21,11 @@ class QuestionAnswerBase(BaseModel):
     Attributes:
         question (str): The question asked by the user.
         answer (str): The answer provided for the question.
+        metadata (Metadata): Metadata about the document that the LLM used to provide the answer to the question.
     """
     question: str
     answer: str
+    answer_metadata: List[AnswerMetadata] = []
 
 
 class QuestionAnswer(QuestionAnswerBase):

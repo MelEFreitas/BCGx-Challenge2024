@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.schemas.chat import ChatContent, ChatCreate, ChatInfo, ChatSummary, ChatUpdate, Chat
-from app.schemas.question_answer import QuestionAnswerBase
+from app.schemas.question_answer import AnswerMetadata, QuestionAnswerBase
 from app.api.routes.auth import get_current_user
 from app.db.database import get_db
 from app.db import crud
@@ -38,10 +38,22 @@ def create_chat(
     response = ask_question_ai(db_chat=None, question=chat, role=current_user.role)
     chat_info = ChatInfo(title=title, question_answer=response)
     db_chat = crud.create_chat(db, current_user, chat_info)
+    
     return Chat(
         id=db_chat.id,
         title=db_chat.title,
-        conversation=[QuestionAnswerBase(question=qa.question, answer=qa.answer) for qa in db_chat.conversation]
+        conversation=[
+            QuestionAnswerBase(
+                question=qa.question,
+                answer=qa.answer,
+                answer_metadata=[
+                    AnswerMetadata(
+                        page_number=am.page_number,
+                        file_name=am.file_name
+                    ) for am in qa.answer_metadatas
+                ]
+            ) for qa in db_chat.conversation
+        ]
     )
 
 
@@ -154,6 +166,15 @@ def get_chat_by_id(
         id=db_chat.id,
         title=db_chat.title,
         conversation=[
-            QuestionAnswerBase(question=qa.question, answer=qa.answer) for qa in db_chat.conversation
+            QuestionAnswerBase(
+                question=qa.question,
+                answer=qa.answer,
+                answer_metadata=[
+                    AnswerMetadata(
+                        page_number=am.page_number,
+                        file_name=am.file_name
+                    ) for am in qa.answer_metadatas
+                ]
+            ) for qa in db_chat.conversation
         ]
     )

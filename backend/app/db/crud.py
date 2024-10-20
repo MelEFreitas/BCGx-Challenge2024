@@ -11,6 +11,8 @@ from app.db.models.question_answer import QuestionAnswerDB
 from app.db.models.user import UserDB
 from app.schemas.user import UserCreate
 from app.schemas.chat import ChatContent, ChatInfo
+from app.schemas.question_answer import AnswerMetadata
+from app.db.models.answer_metadata import AnswerMetadataDB
 
 
 def get_user(db: Session, user_id: uuid.UUID) -> UserDB | None:
@@ -118,11 +120,24 @@ def create_chat(db: Session, db_user: UserDB, chat_info: ChatInfo) -> ChatDB:
     question_answer = QuestionAnswerDB(
         question=chat_info.question_answer.question,
         answer=chat_info.question_answer.answer,
-        chat_id=db_chat.id  # Here, db_chat.id is a UUID
+        chat_id=db_chat.id
     )
     db.add(question_answer)
     db.commit()
     db.refresh(question_answer)
+
+    answer_metadatas = []
+    
+    for metadata in chat_info.question_answer.answer_metadata: 
+        new_metadata = AnswerMetadataDB(
+            page_number=metadata.page_number,
+            file_name=metadata.file_name,
+            qa_id=question_answer.id 
+        )
+        answer_metadatas.append(new_metadata)
+
+    db.add_all(answer_metadatas)
+    db.commit()
     return db_chat
 
 
@@ -141,11 +156,23 @@ def add_question_answer_to_chat(db: Session, db_chat: ChatDB, chat_content: Chat
     new_db_qa = QuestionAnswerDB(
         question=chat_content.question_answer.question,
         answer=chat_content.question_answer.answer,
-        chat_id=db_chat.id  # Here, db_chat.id is a UUID
+        chat_id=db_chat.id
     )
     db.add(new_db_qa)
     db.commit()
     db.refresh(new_db_qa)
+
+    new_answer_metadatas = []
+    
+    for metadata in chat_content.question_answer.answer_metadata: 
+        new_metadata = AnswerMetadataDB(
+            page_number=metadata.page_number,
+            file_name=metadata.file_name,
+            qa_id=new_db_qa.id 
+        )
+        new_answer_metadatas.append(new_metadata)
+    db.add_all(new_answer_metadatas)
+    db.commit()
     return new_db_qa
 
 

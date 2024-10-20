@@ -39,5 +39,8 @@
   "managerTitle": "Manager",
   "managerDescription": "GaIA will assits you in understanding the current laws and plans.",
   "envAnalystTitle": "Environmental Analyst",
-  "envAnalystDescription": "A technical and detail-rich conversation is what you are looking for."
+  "envAnalystDescription": "A technical and detail-rich conversation is what you are looking for.",
+  "source": "Sources:",
+  "doc": "Document:",
+  "page": "Page:"
 }

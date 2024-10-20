@@ -1,3 +1,4 @@
+import 'package:frontend/data/models/question_answer/metadata.dart';
 import 'package:frontend/domain/entities/question_answer/question_answer.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -19,13 +20,16 @@ class QuestionAnswerModel {
   /// Creates an instance of [QuestionAnswerModel].
   ///
   /// Requires [question] and [answer] to be provided.
-  QuestionAnswerModel({required this.question, required this.answer});
+  QuestionAnswerModel({required this.question, required this.answer, required this.metadata});
 
   /// The text of the question.
   final String question;
 
   /// The text of the answer.
   final String answer;
+
+  @JsonKey(name: 'answer_metadata')
+  final List<MetadataModel>? metadata;
 
   /// Converts the [QuestionAnswerModel] instance to a [QuestionAnswerEntity].
   ///
@@ -34,6 +38,7 @@ class QuestionAnswerModel {
     return QuestionAnswerEntity(
       question: question,
       answer: answer,
+      metadata: metadata?.map((m) => m.toEntity()).toList(),
     );
   }
 
@@ -44,6 +49,7 @@ class QuestionAnswerModel {
     return QuestionAnswerModel(
       question: entity.question,
       answer: entity.answer,
+      metadata: entity.metadata?.map((m) => MetadataModel.fromEntity(m)).toList(),
     );
   }
 

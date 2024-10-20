@@ -81,14 +81,77 @@ class _ChatDisplayState extends State<ChatDisplay> {
                           ),
                         ),
                         Flexible(
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(vertical: 4.0),
-                            padding: const EdgeInsets.all(10.0),
-                            decoration: BoxDecoration(
-                              color: isQuestion ? ThemeColors.logoLightOrange : ThemeColors.grey,
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            child: Text(isQuestion ? qa.question : qa.answer, style: TextStyle(fontSize: screenWidth > 900 ? 19 : 17),),
+                          child: Column(
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.symmetric(vertical: 4.0),
+                                padding: const EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                  color: isQuestion ? ThemeColors.logoLightOrange : ThemeColors.grey,
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: Text(isQuestion ? qa.question : qa.answer, style: TextStyle(fontSize: screenWidth > 900 ? 19 : 17),),
+                              ),
+                              if (qa.metadata != null && qa.metadata!.isNotEmpty)
+                                Container(
+                                  padding: const EdgeInsets.all(8.0),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.shade100, // Adjust color as needed
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        localizations.source,
+                                        style: TextStyle(
+                                          fontSize: screenWidth > 900 ? 17 : 15,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      ...qa.metadata!.map((m) => Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            '•',
+                                            style: TextStyle(
+                                              fontSize: screenWidth > 900 ? 17 : 15,
+                                            ),
+                                          ),
+                                          const SizedBox(width: 5),
+                                          Expanded(
+                                            child: RichText(
+                                              text: TextSpan(
+                                                style: TextStyle(
+                                                  fontSize: screenWidth > 900 ? 17 : 15,
+                                                  color: Colors.black,
+                                                ),
+                                                children: [
+                                                  TextSpan(
+                                                    text: localizations.doc,
+                                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                                  ),
+                                                  TextSpan(
+                                                    text: ' ${m.fileName} ',
+                                                  ),
+                                                  TextSpan(
+                                                    text: localizations.page,
+                                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                                  ),
+                                                  TextSpan(
+                                                    text: ' ${m.pageNumber}',
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      )),
+                                    ],
+                                  ),
+                                ),
+                            ],
                           ),
                         )
                       ],
@@ -100,10 +163,6 @@ class _ChatDisplayState extends State<ChatDisplay> {
         } else {
           return Center(child: Text(localizations.startChat));
         }
-        
-        //else {
-          //return const Center(child: Text(''));
-        //}
       },
     );
   }

@@ -47,3 +47,5 @@ frontend/android/app/release
 # Python
 __pycache__/
 .ruff_cache/
+.coverage
+htmlcov/

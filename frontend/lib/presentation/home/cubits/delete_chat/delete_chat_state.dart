@@ -7,7 +7,7 @@ sealed class DeleteChatState extends Equatable {
   List<Object> get props => [];
 }
 
-class DeleteChatStateInitital extends DeleteChatState {}
+class DeleteChatStateInitial extends DeleteChatState {}
 
 class DeleteChatStateLoading extends DeleteChatState {}
 
