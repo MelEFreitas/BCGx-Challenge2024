@@ -8,7 +8,7 @@ OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 
 faiss_index_path = "faiss_index"
 
-role = 'Public Manager'
+role = 'especialista ambiental'
 
 def main():
     

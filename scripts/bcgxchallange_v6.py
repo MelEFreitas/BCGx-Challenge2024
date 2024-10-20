@@ -64,10 +64,6 @@ def load_and_process_documents(file_paths):
         loader = PyMuPDFLoader(file_path)  # Carregar o PDF
         pages = loader.load()  # Carregar todas as páginas do PDF
 
-        # Remove numeração de linhas no início da linha (ex: '1. texto' ou '1 texto')
-        # pages = re.sub(r'^\d+\.\s*', '', pages, flags=re.MULTILINE)
-        # pages = re.sub(r'^\d+\s+', '', pages, flags=re.MULTILINE)
-
         for page_number, page in enumerate(pages):
             text = page.page_content
             if is_relevant_page(text):  # Se a página for relevante
@@ -116,13 +112,6 @@ def extract_text_from_images(image_data):
         image = Image.open(image_filename)
         text_from_image = pytesseract.image_to_string(image)
 
-        # if text_from_image.strip():
-        #     image_texts.append({
-        #         "page": image_info["page"],
-        #         "image_filename": image_filename,
-        #         "text": text_from_image
-        #     })
-
         if text_from_image.strip():
           metadata = {
                         "file_name": image_info["page"],
@@ -134,10 +123,6 @@ def extract_text_from_images(image_data):
               "metadata": metadata
           })
 
-        # if text_from_image.strip():
-            # image_texts.append(
-            #     text_from_image
-            # )
 
     return image_texts
 
@@ -249,7 +234,6 @@ def main():
 
     # Inicializa os embeddings
     embeddings = OpenAIEmbeddings()
-    # embeddings = OpenAIEmbeddings(openai_api_key = openai_api_key)
 
     # Cria embeddings dos textos para os documentos processados
     all_documents = []

@@ -15,10 +15,13 @@ OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')  # Fetch the OpenAI API key fr
 
 faiss_path = "faiss_index"  # Path to the FAISS index
 
+role = 'especialista ambiental'
+
 # Initialize the Chatbot object with API key and FAISS index path
 chatbot = Chatbot(  
         openai_api_key=OPENAI_API_KEY,   
-        faiss_index_path=faiss_path
+        faiss_index_path=faiss_path,
+        role = role
     )
 
 # Function to apply RAGAS on the generated responses
@@ -105,7 +108,7 @@ def main(dataframe_path, test_id):
     
     # Read the test data from the CSV file
     qa_test = pd.read_csv(dataframe_path, encoding='ISO-8859-1')
-    qa_test = qa_test[:2]  # Take the first two rows for testing
+    qa_test = qa_test[:100]  # Take the first two rows for testing
     
     # Apply RAGAS on the generated responses
     resultados_ragas = apply_ragas(qa_test)  
@@ -140,5 +143,5 @@ def main(dataframe_path, test_id):
 if __name__ == "__main__":
     # Path to your test dataset of questions and expected answers
     dataset_path = "C:/Users/Melissa Freitas/Documents/Melissa/BCGx-Challenge2024/data/teste/qa_for_test.csv"
-    test_id = "context_size_1"  # Identifier for the test run
+    test_id = "1"  # Identifier for the test run
     main(dataset_path, test_id)  # Call the main function to start the evaluation
