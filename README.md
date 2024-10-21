@@ -24,6 +24,11 @@ To get started with GAIA, clone this repository and navigate to the project dire
 ```
 cd BCGx-Challenge2024
 ```
+Than, create a .env file that is going to be used to save the credentials. The file .env.example is a exemple of how this .env should be created.
+```
+touch .env
+```
+
 
 All necessary services for GAIA's operation can be initialized using Docker. Run the following command to build and start the services:
 ```
