@@ -149,3 +149,6 @@ GAIA's security architecture has several areas that could benefit from enhanceme
 
 ### Scalability Enhancements
 On the scalability front, GAIA's current design may struggle under high demand. When multiple users send requests to the backend API, some operations may take longer to process, creating delays. To mitigate this, GAIA could implement an asynchronous message broker to manage communication queues between the user, the backend API, and external services like OpenAI. This approach would minimize idle time for the backend, streamline request handling, and significantly enhance the user experience.
+
+# Video Demo
+[![Watch the video](https://img.youtube.com/vi/evtT280ONAI?si=mm97N_yLy3Mr692_/maxresdefault.jpg)](https://youtu.be/evtT280ONAI?si=mm97N_yLy3Mr692_)
