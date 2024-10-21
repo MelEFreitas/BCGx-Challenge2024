@@ -85,6 +85,64 @@ The backend service utilizes the FastAPI framework to provide an API that adhere
 
 In order for the backend to perform operations, the user must authenticate themselves. GAIA leverages the JWT (JSON Web Tokens) authentication mechanism to provide stateless authentication. Upon signing in, the user is provided with two JWT tokens: an access token, which lasts a couple of minutes, and a refresh token, which lasts for days. Using tokens allows the frontend to avoid having to provide the user's credentials (email and password) for every request. For example, if the authentication mechanism relied on sessions, allowing a user to update a chat would require the backend to fetch their session from a cache, which can be slow if multiple API instances are trying to read from and write to the cache. By using JWT, GAIA can determine the authenticity of a request mathematically by decoding the token. If the access token is expired, the frontend can provide the refresh token to obtain a new access token, avoiding the need to re-enter credentials.
 
+### Data Science Aspects
+
+This chatbot project uses a Retrieval-Augmented Generation (RAG) pipeline to answer questions related to the climate crisis. Below, we explain each stage of the pipeline and how the different components interact to generate quality responses.
+
+#### User Input
+The chatbot processes the user's input in real-time. The first step is question classification:
+
+**General Question**: These are trivial questions or interactions that can be answered directly, without the need to search through documents (e.g., greetings, general information).
+**Specific Question**: These are questions that require an answer based on information contained in external documents, such as reports or climate action plans.
+The classification of the input is done automatically through a language model (LLM) that decides whether the question can be answered directly or if it needs to consult the document database.
+
+#### Question Classification
+The pipeline uses an LLM to classify the user's question based on its content. The process follows this logic:
+
+General Questions: Direct and quick responses are provided.
+Specific Questions: A query is triggered to the document database to retrieve relevant contextual information.
+This classification is essential to optimize the chatbot's performance, allowing it to respond quickly to simple questions and provide more complex answers based on documents when necessary.
+
+#### Document Retrieval (RAG)
+When a question is classified as specific, the chatbot searches for documents that contain relevant information to generate an accurate answer. We use FAISS as a vector database to store embeddings generated from the documents.
+
+Embedding Storage: Documents are converted into embeddings using the OpenAI API and stored in the FAISS vector database.
+Retrieval Mechanism: FAISS is used to retrieve documents similar to the question based on embeddings. To optimize the search, we use a combination of parameters, such as:
+Score Threshold: Sets a minimum similarity threshold between the documents and the question.
+k: Limits the number of documents returned in the search to avoid overload.
+
+#### Answer Generation
+After retrieving relevant documents, the chatbot uses the context from these documents and the conversation history to generate an answer.
+
+**Language Model (LLM)**: The model used is GPT-4, accessed via the LangChain library. Specific LLM parameters are adjusted to optimize answer generation:
+*Temperature*: Controls the creativity of the responses (the higher, the more creative).
+*Frequency Penalty*: Penalizes word repetition, promoting more variety.
+*Presence Penalty*: Encourages the use of new topics and terms in the answer.
+These parameters allow for a balance between creativity, accuracy, and fluency in the generated responses.
+
+#### Conversational Memory
+The chatbot uses an advanced memory system to improve the coherence of answers throughout an interaction. We use LangChain to manage multiple types of memory:
+
+**ConversationSummaryMemory**: Summarizes past interactions to ensure the chatbot remembers topics discussed earlier in the conversation.
+**ConversationEntityMemory**: Stores entities (names, places, dates) mentioned during the conversation to provide more contextualized answers.
+These memory mechanisms ensure that the chatbot maintains a continuous context throughout long interactions, avoiding unnecessary repetition of information.
+
+#### User Roles
+The chatbot adapts its responses based on the user's role, which is defined at the start of the conversation. There are three available profiles:
+
+**Standard User**: *Simple and accessible answers, with less technical detail.*
+**Environmental Specialist**: *Detailed responses with technical terms and greater depth on climate-related topics.*
+**Municipal Manager**: *Focused on practical actions that can be implemented at the municipal level.*
+The user's role is incorporated into the model's prompt, ensuring that the tone and level of detail of the answers are adjusted according to the user's profile.
+
+#### Response Validation (RAGAS)
+The quality of the responses generated by the chatbot is evaluated using the RAGAS framework, which measures several key metrics to ensure the accuracy and relevance of the answers. Some examples of used metrics:
+
+**Faithfulness**: *Measures how faithfully the generated response reflects the source documents.*
+**Answer Correctness**: *Evaluates the correctness of the answers based on the user's question.*
+
+These metrics help ensure that the chatbot provides reliable answers based on relevant documentary sources.
+
 ## Next Steps
 ### Security Improvements
 GAIA's security architecture has several areas that could benefit from enhancement. Currently, all communication between services relies on the HTTP protocol, where access tokens are sent in the headers without encryption. This exposes a critical vulnerability, as an attacker could potentially execute a man-in-the-middle attack and intercept the user's token. Additionally, the tokens are stored in the browser without encryption, further increasing the risk of compromise.
