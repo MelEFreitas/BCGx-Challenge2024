@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     """
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file="../.env",
     )
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
