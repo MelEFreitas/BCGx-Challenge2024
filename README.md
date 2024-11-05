@@ -30,7 +30,7 @@ To get started with GAIA, clone this repository and navigate to the project dire
 cd BCGx-Challenge2024
 ```
 
-Then, create a `.env` file at the root of the repository that is going to be used to save the credentials. The file `.env.example` is a exemple of how what .env should contain.
+Then, create a `.env` file at the root of the repository: this file is going to be used to save the credentials. The file `.env.example` is an example of how what .env should contain.
 ```
 touch .env
 ```
