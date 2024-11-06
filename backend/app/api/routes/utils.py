@@ -20,25 +20,27 @@ instructions = """
 """
 
 qa_system_prompt = """
-    You are a climate crisis specialist. Use the following context from retrieved documents to answer the user's question.
-    {instruction}
-    
+    You are a climate crisis specialist. 
+    Use the following context from retrieved documents and, if you think is useful, the chat history to answer the user's question.
+    Also, {instruction}
     Context: {context},
 
-    Chat History: {chat_history},
-    
+    Chat History: {chat_history}, 
+
     Question: {question}
-"""
+
+    Rethink about your answer and make sure it is accurate and informative.
+    If you don't feel confident about the answer, you can admit that you are not completley sure and ask for more information.
+    """
 
 general_question_prompt_template = """
-    You are an assistant trained to identify the type of question. 
-    Classify as "General" if the question is ONLY a greeting like "Hi/Hello/Good morning/Thank you," 
-    or "Specific" if it's a detailed question requiring information from a database.
+    You are an assistant trained to identify the type of question. Classify the question as follows:
+    - Answer "General" if the question is about trivial or everyday topics, or unrelated to the climate crisis, and can be answered without consulting specific documents or data.
+    - Answer "Specific" only if the question involves climate-related topics or requires consulting detailed information from a climate crisis database.
 
     Question: {question}
-
     Classification:
-"""
+    """
 
 score_threshold = 0.8
 
@@ -53,7 +55,7 @@ embeddings = OpenAIEmbeddings()
 faiss = FAISS.load_local(faiss_index_path, embeddings, allow_dangerous_deserialization=True)
 retriever = faiss.as_retriever(
     search_type="similarity_score_threshold", 
-    search_kwargs={"score_threshold": 0.75, 'k': 5}
+    search_kwargs={"score_threshold": 0.78, 'k': 3}
 )
 
 # Memory modules to track conversation
@@ -187,27 +189,34 @@ def handle_specific_question(db_chat: ChatDB | None, question: str, role: str):
     context = retriever.get_relevant_documents(question)
     instruction = get_system_message(role)
 
-    if not context:
-        return "I do not have enough information to answer.", []
-    
-    ai_message = rag_chain.invoke({
-        "instruction": instruction,
-        "question": question,
-        "context": context[0],
-        "chat_history": chat_history
-    })
-
     answer_metadatas = []
 
-    for doc in context:
-        answer_metadatas.append(
-            AnswerMetadata(
-                page_number=str(doc.metadata.get('page_number')),
-                file_name=str(doc.metadata.get('file_name'))
-            )
-        )
+    if not context:
+        ai_message = rag_chain.invoke({
+            "instruction": instruction,
+            "question": question,
+            "context": [""],
+            "chat_history": chat_history
+        })
 
-    return ai_message, answer_metadatas
+        return ai_message, answer_metadatas
+    else:
+        ai_message = rag_chain.invoke({
+            "instruction": instruction,
+            "question": question,
+            "context": context[0],
+            "chat_history": chat_history
+        })
+
+        for doc in context:
+            answer_metadatas.append(
+                AnswerMetadata(
+                    page_number=str(doc.metadata.get('page_number')),
+                    file_name=str(doc.metadata.get('file_name'))
+                )
+            )
+
+        return ai_message, answer_metadatas
     
 
 def ask_question_ai(db_chat: ChatDB | None, question: ChatBase, role: str) -> QuestionAnswerBase:
